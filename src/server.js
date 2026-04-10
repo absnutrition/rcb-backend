@@ -56,21 +56,6 @@ const corsOptions = {
 // ── Middleware ────────────────────────────────────────
 app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: false }));
 
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc:  ["'self'"],
-      scriptSrc:   ["'self'", "'unsafe-inline'", 'https://js.stripe.com', 'https://fonts.googleapis.com'],
-      styleSrc:    ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://fonts.gstatic.com'],
-      fontSrc:     ["'self'", 'https://fonts.gstatic.com', 'data:'],
-      connectSrc:  ["'self'", 'https://api.stripe.com'],
-      frameSrc:    ['https://js.stripe.com'],
-      imgSrc:      ["'self'", 'data:', 'blob:'],
-    }
-  },
-  crossOriginResourcePolicy: { policy: 'cross-origin' },
-}));
-
 // Stripe webhook needs raw body — must come before json parser
 app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));
 
