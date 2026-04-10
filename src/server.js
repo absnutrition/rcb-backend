@@ -19,6 +19,8 @@ const tenants               = require('./config/tenants');
 const app  = express();
 const PORT = process.env.PORT || 3001;
 
+// Trust Railway's proxy (required for rate limiter and correct IP detection)
+app.set('trust proxy', 1);
 // ── Directories ───────────────────────────────────────
 const UPLOAD_DIR = path.join(__dirname, '..', 'uploads');
 const LOG_DIR    = path.join(__dirname, '..', 'logs');
