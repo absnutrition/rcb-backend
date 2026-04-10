@@ -64,10 +64,10 @@ router.get('/', async (req, res) => {
   <input type="password" id="password" placeholder="Create a strong password">
   <label>Confirm Password</label>
   <input type="password" id="confirm" placeholder="Repeat password">
-  <button id="btn" onclick="submit()">Create Admin Account</button>
+  <button id="btn" onclick="createAdmin()">Create Admin Account</button>
 </div>
 <script>
-async function submit() {
+async function createAdmin() {
   const email    = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value;
   const confirm  = document.getElementById('confirm').value;
