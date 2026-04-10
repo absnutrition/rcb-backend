@@ -54,9 +54,19 @@ const corsOptions = {
 };
 
 // ── Middleware ────────────────────────────────────────
-app.use(helmet({ contentSecurityPolicy: false }));
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc:  ["'self'"],
+      scriptSrc:   ["'self'", "'unsafe-inline'"],
+      styleSrc:    ["'self'", "'unsafe-inline'", 'fonts.googleapis.com'],
+      fontSrc:     ["'self'", 'fonts.gstatic.com'],
+      connectSrc:  ["'self'", 'api.stripe.com'],
+      frameSrc:    ['js.stripe.com'],
+      imgSrc:      ["'self'", 'data:', 'blob:'],
+    }
+  }
+}));
 
 // Stripe webhook needs raw body — must come before json parser
 app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));
