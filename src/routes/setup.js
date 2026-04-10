@@ -78,7 +78,7 @@ async function submit() {
   if (password !== confirm) { err.textContent = 'Passwords do not match.'; err.style.display = 'block'; return; }
   btn.disabled = true; btn.textContent = 'Creating...';
   try {
-    const res  = await fetch('/api/setup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+    const res  = await fetch(window.location.origin + '/api/setup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
     const data = await res.json();
     if (!res.ok) { err.textContent = data.error || 'Failed.'; err.style.display = 'block'; btn.disabled = false; btn.textContent = 'Create Admin Account'; return; }
     document.body.innerHTML = '<div style="font-family:Arial;text-align:center;padding:60px;background:#0a1628;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#f5f0e8;"><div style="font-size:64px;margin-bottom:24px">✅</div><h2 style="color:#2aaa5c;font-size:28px;margin-bottom:12px">Admin Account Created!</h2><p style="color:rgba(245,240,232,0.6);margin-bottom:32px">Signed in as: ' + data.email + '</p><a href="/admin" style="background:#c8102e;color:white;padding:14px 40px;border-radius:8px;text-decoration:none;font-size:16px;font-weight:700">Go to Admin Portal →</a></div>';
