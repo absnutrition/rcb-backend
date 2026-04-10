@@ -1,0 +1,2489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Portal — Rocket City Banner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════ */
+:root {
+  --navy:      #0a1628;
+  --navy-mid:  #132040;
+  --navy-lite: #1e3060;
+  --navy-ui:   #243558;
+  --red:       #c8102e;
+  --red-dark:  #9e0d23;
+  --red-lite:  #e8213f;
+  --cream:     #f5f0e8;
+  --gold:      #d4a843;
+  --white:     #ffffff;
+  --sidebar-w: 240px;
+  --topbar-h:  60px;
+  --green:     #1a8a3c;
+  --green-bg:  rgba(26,138,60,0.1);
+  --amber:     #b07010;
+  --amber-bg:  rgba(176,112,16,0.1);
+  --red-bg:    rgba(200,16,46,0.1);
+  --blue:      #185fa5;
+  --blue-bg:   rgba(24,95,165,0.1);
+  --border:    rgba(255,255,255,0.08);
+  --border-light: rgba(10,22,40,0.1);
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-cond: 'Barlow Condensed', sans-serif;
+  --font-body: 'Barlow', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --r: 6px;
+  --r-lg: 10px;
+}
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html,body { height:100%; font-family:var(--font-body); background:var(--navy); color:var(--cream); overflow:hidden; }
+a { color:inherit; text-decoration:none; }
+button { font-family:var(--font-body); cursor:pointer; border:none; outline:none; }
+input,select,textarea { font-family:var(--font-body); }
+ul { list-style:none; }
+::-webkit-scrollbar { width:5px; height:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.12); border-radius:3px; }
+
+/* ═══════════════════════════════════════════
+   AUTH SCREENS
+═══════════════════════════════════════════ */
+#authScreen {
+  position:fixed; inset:0; background:var(--navy);
+  display:flex; align-items:center; justify-content:center;
+  z-index:9000;
+}
+.auth-card {
+  background:var(--navy-mid); border:1px solid var(--border);
+  border-radius:var(--r-lg); padding:40px; width:100%;
+  max-width:400px; position:relative;
+}
+.auth-logo { text-align:center; margin-bottom:32px; }
+.auth-logo-icon {
+  width:52px; height:52px; background:var(--red); border-radius:8px;
+  display:flex; align-items:center; justify-content:center; margin:0 auto 12px;
+}
+.auth-logo-text { font-family:var(--font-display); font-size:22px; color:var(--cream); letter-spacing:2px; }
+.auth-logo-sub { font-family:var(--font-cond); font-size:11px; color:rgba(245,240,232,0.4); letter-spacing:3px; text-transform:uppercase; margin-top:2px; }
+.auth-title { font-family:var(--font-cond); font-size:13px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:rgba(245,240,232,0.5); text-align:center; margin-bottom:24px; }
+.auth-field { margin-bottom:16px; }
+.auth-field label { display:block; font-family:var(--font-cond); font-size:12px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:rgba(245,240,232,0.5); margin-bottom:6px; }
+.auth-field input {
+  width:100%; padding:11px 14px; background:rgba(255,255,255,0.05);
+  border:1.5px solid rgba(255,255,255,0.1); border-radius:var(--r);
+  color:var(--cream); font-size:15px; transition:border-color 0.2s;
+}
+.auth-field input:focus { outline:none; border-color:rgba(200,16,46,0.6); background:rgba(255,255,255,0.08); }
+.auth-field input.error { border-color:var(--red); }
+.auth-err { font-size:12px; color:#ff6b6b; margin-top:5px; display:none; }
+.auth-err.show { display:block; }
+.auth-submit {
+  width:100%; background:var(--red); color:white; padding:13px;
+  font-family:var(--font-cond); font-size:16px; font-weight:700; letter-spacing:2px;
+  text-transform:uppercase; border-radius:var(--r); transition:background 0.2s;
+  margin-top:4px;
+}
+.auth-submit:hover { background:var(--red-dark); }
+.auth-submit:disabled { opacity:0.5; cursor:not-allowed; }
+.auth-back { background:none; border:none; color:rgba(245,240,232,0.5); font-size:13px; cursor:pointer; margin-top:16px; display:block; text-align:center; width:100%; }
+.auth-back:hover { color:var(--cream); }
+
+/* 2FA OTP inputs */
+.otp-inputs { display:flex; gap:10px; justify-content:center; margin:8px 0 20px; }
+.otp-input {
+  width:48px; height:56px; background:rgba(255,255,255,0.06);
+  border:1.5px solid rgba(255,255,255,0.12); border-radius:var(--r);
+  color:var(--cream); font-size:24px; font-weight:600; text-align:center;
+  font-family:var(--font-mono); transition:border-color 0.2s;
+}
+.otp-input:focus { outline:none; border-color:var(--red); background:rgba(255,255,255,0.1); }
+
+/* QR code setup screen */
+.qr-container { text-align:center; margin:20px 0; }
+.qr-container img { border-radius:var(--r); border:4px solid white; width:180px; height:180px; }
+.manual-key {
+  background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);
+  border-radius:var(--r); padding:10px 14px; font-family:var(--font-mono);
+  font-size:13px; color:var(--gold); text-align:center; word-break:break-all;
+  margin:12px 0;
+}
+.auth-step-indicator { display:flex; justify-content:center; gap:8px; margin-bottom:24px; }
+.auth-step { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.15); transition:background 0.3s; }
+.auth-step.active { background:var(--red); }
+.auth-step.done { background:rgba(200,16,46,0.4); }
+.lock-icon { font-size:40px; text-align:center; margin-bottom:16px; }
+.security-badge {
+  display:flex; align-items:center; gap:8px; padding:10px 14px;
+  background:rgba(26,138,60,0.1); border:1px solid rgba(26,138,60,0.3);
+  border-radius:var(--r); margin-bottom:20px;
+  font-size:13px; color:rgba(245,240,232,0.7);
+}
+
+/* ═══════════════════════════════════════════
+   APP SHELL
+═══════════════════════════════════════════ */
+#appShell { display:none; height:100vh; width:100vw; }
+#appShell.visible { display:flex; }
+
+/* SIDEBAR */
+#sidebar {
+  width:var(--sidebar-w); flex-shrink:0; background:var(--navy-mid);
+  border-right:1px solid var(--border); display:flex; flex-direction:column;
+  height:100vh; position:relative; z-index:100;
+}
+.sidebar-logo {
+  padding:20px 20px 16px; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:10px;
+}
+.sidebar-logo-icon {
+  width:34px; height:34px; background:var(--red); border-radius:5px;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.sidebar-logo-text { font-family:var(--font-display); font-size:16px; color:var(--cream); letter-spacing:1px; line-height:1.1; }
+.sidebar-logo-sub { font-family:var(--font-cond); font-size:9px; color:rgba(245,240,232,0.35); letter-spacing:2px; text-transform:uppercase; }
+.sidebar-nav { flex:1; padding:12px 0; overflow-y:auto; }
+.nav-section-label {
+  font-family:var(--font-cond); font-size:10px; font-weight:600; letter-spacing:2px;
+  text-transform:uppercase; color:rgba(245,240,232,0.25);
+  padding:16px 20px 6px;
+}
+.nav-item {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 20px; cursor:pointer; transition:all 0.15s;
+  border-left:3px solid transparent; font-family:var(--font-cond);
+  font-size:14px; font-weight:600; letter-spacing:0.5px; color:rgba(245,240,232,0.55);
+}
+.nav-item:hover { background:rgba(255,255,255,0.04); color:var(--cream); }
+.nav-item.active { background:rgba(200,16,46,0.1); color:var(--cream); border-left-color:var(--red); }
+.nav-item-icon { font-size:16px; width:20px; text-align:center; }
+.nav-badge {
+  margin-left:auto; background:var(--red); color:white;
+  font-size:10px; font-weight:700; min-width:18px; height:18px;
+  border-radius:9px; display:flex; align-items:center; justify-content:center;
+  padding:0 5px;
+}
+.sidebar-footer {
+  padding:16px 20px; border-top:1px solid var(--border);
+}
+.admin-chip {
+  display:flex; align-items:center; gap:10px; padding:10px 12px;
+  background:rgba(255,255,255,0.04); border-radius:var(--r); margin-bottom:10px;
+}
+.admin-avatar {
+  width:32px; height:32px; background:var(--red); border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-cond); font-size:14px; font-weight:700; color:white;
+}
+.admin-name { font-size:13px; font-weight:600; color:var(--cream); }
+.admin-role { font-size:11px; color:rgba(245,240,232,0.4); }
+.logout-btn {
+  width:100%; background:rgba(200,16,46,0.1); border:1px solid rgba(200,16,46,0.2);
+  color:rgba(245,240,232,0.6); font-family:var(--font-cond); font-size:13px;
+  font-weight:600; letter-spacing:1px; text-transform:uppercase;
+  padding:8px; border-radius:var(--r); cursor:pointer; transition:all 0.2s;
+}
+.logout-btn:hover { background:rgba(200,16,46,0.2); color:var(--cream); }
+
+/* MAIN AREA */
+#main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+
+/* TOPBAR */
+#topbar {
+  height:var(--topbar-h); background:var(--navy-mid); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; padding:0 28px; gap:16px; flex-shrink:0;
+}
+.topbar-title { font-family:var(--font-cond); font-size:20px; font-weight:700; color:var(--cream); letter-spacing:1px; flex:1; }
+.topbar-search {
+  display:flex; align-items:center; gap:8px;
+  background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08);
+  border-radius:var(--r); padding:7px 12px; width:260px;
+}
+.topbar-search input {
+  background:none; border:none; color:var(--cream); font-size:14px; width:100%;
+}
+.topbar-search input::placeholder { color:rgba(245,240,232,0.3); }
+.topbar-search input:focus { outline:none; }
+.refresh-btn {
+  background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08);
+  color:rgba(245,240,232,0.6); width:36px; height:36px; border-radius:var(--r);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px;
+  transition:all 0.2s;
+}
+.refresh-btn:hover { background:rgba(255,255,255,0.1); color:var(--cream); }
+
+/* CONTENT */
+#content { flex:1; overflow-y:auto; padding:28px; }
+.page { display:none; }
+.page.active { display:block; }
+
+/* ═══════════════════════════════════════════
+   COMPONENTS
+═══════════════════════════════════════════ */
+/* Stat Cards */
+.stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; margin-bottom:28px; }
+.stat-card {
+  background:var(--navy-mid); border:1px solid var(--border);
+  border-radius:var(--r-lg); padding:20px 22px;
+}
+.stat-label { font-family:var(--font-cond); font-size:11px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:rgba(245,240,232,0.4); margin-bottom:8px; }
+.stat-val { font-family:var(--font-display); font-size:32px; color:var(--cream); line-height:1; }
+.stat-sub { font-size:12px; color:rgba(245,240,232,0.4); margin-top:4px; }
+.stat-card.highlight { border-color:rgba(200,16,46,0.3); background:rgba(200,16,46,0.06); }
+.stat-card.highlight .stat-val { color:var(--gold); }
+
+/* Tables */
+.table-card {
+  background:var(--navy-mid); border:1px solid var(--border);
+  border-radius:var(--r-lg); overflow:hidden;
+}
+.table-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 20px; border-bottom:1px solid var(--border);
+}
+.table-title { font-family:var(--font-cond); font-size:16px; font-weight:700; color:var(--cream); letter-spacing:1px; text-transform:uppercase; }
+.table-actions { display:flex; gap:8px; }
+table { width:100%; border-collapse:collapse; }
+th {
+  font-family:var(--font-cond); font-size:11px; font-weight:600; letter-spacing:2px;
+  text-transform:uppercase; color:rgba(245,240,232,0.35);
+  padding:12px 20px; text-align:left; background:rgba(255,255,255,0.02);
+  border-bottom:1px solid var(--border); white-space:nowrap;
+}
+td {
+  padding:13px 20px; font-size:14px; color:rgba(245,240,232,0.8);
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  vertical-align:middle;
+}
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:rgba(255,255,255,0.025); }
+.td-name { font-weight:600; color:var(--cream); }
+.td-mono { font-family:var(--font-mono); font-size:12px; }
+.td-action { text-align:right; }
+
+/* Status Badges */
+.badge {
+  display:inline-flex; align-items:center; gap:5px;
+  font-family:var(--font-cond); font-size:11px; font-weight:700; letter-spacing:1px;
+  text-transform:uppercase; padding:3px 10px; border-radius:20px;
+}
+.badge::before { content:''; width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.badge-order_placed   { background:var(--blue-bg);  color:#5b9fd4; } .badge-order_placed::before { background:#5b9fd4; }
+.badge-approval_sent  { background:var(--amber-bg); color:#d4a843; } .badge-approval_sent::before { background:#d4a843; }
+.badge-order_approved { background:var(--green-bg); color:#2aaa5c; } .badge-order_approved::before { background:#2aaa5c; }
+.badge-printed        { background:rgba(110,61,200,0.12); color:#9b8de8; } .badge-printed::before { background:#9b8de8; }
+.badge-received       { background:var(--green-bg); color:#2aaa5c; } .badge-received::before { background:#2aaa5c; }
+.badge-paid           { background:var(--green-bg); color:#2aaa5c; } .badge-paid::before { background:#2aaa5c; }
+.badge-pending     { background:var(--amber-bg); color:#d4a843; } .badge-pending::before { background:#d4a843; }
+.badge-production  { background:var(--blue-bg);  color:#5b9fd4; } .badge-production::before { background:#5b9bd4; }
+.badge-shipped     { background:rgba(100,80,200,0.12); color:#9b8de8; } .badge-shipped::before { background:#9b8de8; }
+.badge-delivered   { background:var(--green-bg); color:#2aaa5c; } .badge-delivered::before { background:#2aaa5c; }
+.badge-cancelled   { background:rgba(255,255,255,0.06); color:rgba(245,240,232,0.4); } .badge-cancelled::before { background:rgba(245,240,232,0.3); }
+.badge-failed      { background:var(--red-bg); color:#ff6b6b; } .badge-failed::before { background:#ff6b6b; }
+.badge-quality     { background:rgba(212,168,67,0.12); color:#d4a843; } .badge-quality::before { background:#d4a843; }
+.badge-refunded    { background:rgba(255,255,255,0.06); color:rgba(245,240,232,0.4); } .badge-refunded::before { background:rgba(245,240,232,0.3); }
+
+/* Buttons */
+.btn-sm {
+  font-family:var(--font-cond); font-size:12px; font-weight:600; letter-spacing:1px;
+  text-transform:uppercase; padding:6px 14px; border-radius:var(--r);
+  cursor:pointer; transition:all 0.15s; border:1px solid transparent;
+}
+.btn-sm-primary { background:var(--red); color:white; border-color:var(--red); }
+.btn-sm-primary:hover { background:var(--red-dark); }
+.btn-sm-ghost { background:rgba(255,255,255,0.06); color:rgba(245,240,232,0.7); border-color:rgba(255,255,255,0.1); }
+.btn-sm-ghost:hover { background:rgba(255,255,255,0.12); color:var(--cream); }
+.btn-sm-success { background:rgba(26,138,60,0.15); color:#2aaa5c; border-color:rgba(26,138,60,0.3); }
+
+/* Filter Bar */
+.filter-bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; align-items:center; }
+.filter-select {
+  background:var(--navy-mid); border:1px solid var(--border); color:var(--cream);
+  font-family:var(--font-cond); font-size:13px; font-weight:600;
+  padding:7px 28px 7px 12px; border-radius:var(--r); cursor:pointer;
+  -webkit-appearance:none; appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(245,240,232,0.4)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 10px center;
+}
+.filter-search {
+  display:flex; align-items:center; gap:8px;
+  background:var(--navy-mid); border:1px solid var(--border);
+  border-radius:var(--r); padding:7px 12px; flex:1; min-width:200px; max-width:340px;
+}
+.filter-search input { background:none; border:none; color:var(--cream); font-size:14px; width:100%; }
+.filter-search input:focus { outline:none; }
+.filter-search input::placeholder { color:rgba(245,240,232,0.25); }
+.filter-count { font-family:var(--font-cond); font-size:13px; color:rgba(245,240,232,0.4); margin-left:auto; }
+
+/* Trend Chart */
+.trend-bar-chart { display:flex; align-items:flex-end; gap:3px; height:80px; padding:0 0 4px; }
+.trend-bar { flex:1; background:rgba(200,16,46,0.3); border-radius:2px 2px 0 0; transition:background 0.2s; min-width:4px; position:relative; cursor:pointer; }
+.trend-bar:hover { background:var(--red); }
+
+/* Order Detail Panel */
+.detail-panel {
+  position:fixed; right:0; top:0; bottom:0; width:480px;
+  background:var(--navy-mid); border-left:1px solid var(--border);
+  z-index:500; display:flex; flex-direction:column;
+  transform:translateX(100%); transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.detail-panel.open { transform:translateX(0); }
+.panel-header {
+  padding:20px 24px; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between; flex-shrink:0;
+}
+.panel-title { font-family:var(--font-cond); font-size:18px; font-weight:700; color:var(--cream); letter-spacing:1px; }
+.panel-close { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); color:rgba(245,240,232,0.6); width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; }
+.panel-close:hover { background:rgba(255,255,255,0.14); color:var(--cream); }
+.panel-body { flex:1; overflow-y:auto; padding:24px; }
+.panel-section { margin-bottom:24px; }
+.panel-section-title { font-family:var(--font-cond); font-size:12px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:rgba(245,240,232,0.35); margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+.panel-row { display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid rgba(255,255,255,0.04); font-size:14px; }
+.panel-row:last-child { border-bottom:none; }
+.panel-row-label { color:rgba(245,240,232,0.5); }
+.panel-row-val { color:var(--cream); font-weight:500; text-align:right; max-width:60%; }
+.panel-footer { padding:20px 24px; border-top:1px solid var(--border); display:flex; gap:8px; flex-shrink:0; }
+.status-select {
+  flex:1; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
+  color:var(--cream); font-family:var(--font-cond); font-size:13px; font-weight:600;
+  padding:9px 12px; border-radius:var(--r); cursor:pointer; -webkit-appearance:none;
+}
+.panel-save-btn {
+  background:var(--red); color:white; font-family:var(--font-cond); font-size:13px;
+  font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  padding:9px 20px; border-radius:var(--r); cursor:pointer; transition:background 0.2s;
+}
+.panel-save-btn:hover { background:var(--red-dark); }
+
+/* Settings Cards */
+.settings-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.settings-card {
+  background:var(--navy-mid); border:1px solid var(--border);
+  border-radius:var(--r-lg); padding:24px;
+}
+.settings-card-title { font-family:var(--font-cond); font-size:15px; font-weight:700; color:var(--cream); text-transform:uppercase; letter-spacing:1px; margin-bottom:18px; display:flex; align-items:center; gap:8px; }
+.s-field { margin-bottom:14px; }
+.s-field label { display:block; font-family:var(--font-cond); font-size:11px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:rgba(245,240,232,0.4); margin-bottom:5px; }
+.s-field input, .s-field select {
+  width:100%; padding:9px 12px; background:rgba(255,255,255,0.05);
+  border:1.5px solid rgba(255,255,255,0.1); border-radius:var(--r);
+  color:var(--cream); font-size:14px; transition:border-color 0.2s;
+}
+.s-field input:focus, .s-field select:focus { outline:none; border-color:rgba(200,16,46,0.5); }
+.s-toggle { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
+.s-toggle:last-child { border-bottom:none; }
+.s-toggle-label { font-size:14px; color:rgba(245,240,232,0.7); }
+.toggle-switch { position:relative; width:42px; height:24px; cursor:pointer; }
+.toggle-switch input { display:none; }
+.toggle-track {
+  position:absolute; inset:0; background:rgba(255,255,255,0.1); border-radius:12px;
+  transition:background 0.2s;
+}
+.toggle-thumb {
+  position:absolute; top:3px; left:3px; width:18px; height:18px;
+  background:white; border-radius:50%; transition:transform 0.2s;
+}
+.toggle-switch input:checked ~ .toggle-track { background:var(--red); }
+.toggle-switch input:checked ~ .toggle-thumb { transform:translateX(18px); }
+.health-indicator { display:flex; align-items:center; gap:8px; padding:10px 14px; border-radius:var(--r); border:1px solid; margin-bottom:10px; font-size:13px; }
+.health-ok { background:var(--green-bg); border-color:rgba(26,138,60,0.3); color:#2aaa5c; }
+.health-err { background:var(--red-bg); border-color:rgba(200,16,46,0.3); color:#ff6b6b; }
+.health-warn { background:var(--amber-bg); border-color:rgba(176,112,16,0.3); color:#d4a843; }
+
+/* Pagination */
+.pagination { display:flex; align-items:center; gap:6px; padding:16px 20px; border-top:1px solid var(--border); justify-content:flex-end; }
+.page-btn {
+  width:32px; height:32px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08);
+  color:rgba(245,240,232,0.6); border-radius:var(--r); cursor:pointer; font-size:13px;
+  display:flex; align-items:center; justify-content:center; transition:all 0.15s;
+}
+.page-btn:hover { background:rgba(255,255,255,0.12); color:var(--cream); }
+.page-btn.active { background:var(--red); border-color:var(--red); color:white; }
+.page-btn:disabled { opacity:0.3; cursor:default; }
+
+/* Overlay */
+.overlay { position:fixed; inset:0; background:rgba(10,22,40,0.6); z-index:400; display:none; }
+.overlay.show { display:block; }
+
+/* Toast */
+.toast {
+  position:fixed; bottom:24px; right:24px; z-index:9999;
+  background:var(--navy-lite); color:var(--cream); padding:13px 18px;
+  border-radius:var(--r); font-family:var(--font-cond); font-size:14px; font-weight:600;
+  display:flex; align-items:center; gap:10px;
+  transform:translateY(60px); opacity:0; transition:all 0.3s;
+  pointer-events:none;
+}
+.toast.show { transform:translateY(0); opacity:1; }
+
+/* Tenant pills */
+.tenant-pill {
+  display:inline-block; font-family:var(--font-cond); font-size:10px; font-weight:700;
+  letter-spacing:1px; text-transform:uppercase; padding:2px 8px; border-radius:10px;
+  white-space:nowrap;
+}
+.tenant-rcb     { background:rgba(200,16,46,0.15);  color:#e8213f; border:1px solid rgba(200,16,46,0.3); }
+.tenant-rivcity { background:rgba(26,95,168,0.15);  color:#5b9fd4; border:1px solid rgba(26,95,168,0.3); }
+.tenant-gameday { background:rgba(230,126,0,0.15);  color:#e67e00; border:1px solid rgba(230,126,0,0.3); }
+.tenant-default { background:rgba(255,255,255,0.08); color:rgba(245,240,232,0.5); border:1px solid rgba(255,255,255,0.1); }
+
+.toast.ok { border-left:3px solid #2aaa5c; }
+.toast.err { border-left:3px solid var(--red); }
+
+/* Responsive */
+@media (max-width:900px) {
+  :root { --sidebar-w: 200px; }
+  .settings-grid { grid-template-columns:1fr; }
+  .detail-panel { width:100%; }
+}
+@media (max-width:640px) {
+  #sidebar { display:none; }
+  #content { padding:16px; }
+}
+
+/* ── Mobile responsive ───────────────────────────── */
+@media (max-width: 768px) {
+  :root { --sidebar-w: 0px; }
+  #sidebar { position:fixed; left:-240px; top:0; bottom:0; width:240px; z-index:200; transition:left 0.3s; }
+  #sidebar.mobile-open { left:0; box-shadow:4px 0 24px rgba(0,0,0,0.4); }
+  #main { width:100vw; }
+  #content { padding:16px; }
+  .topbar { padding:0 14px; }
+  .topbar-search { display:none; }
+  .stat-grid { grid-template-columns:1fr 1fr; gap:10px; }
+  .stat-val { font-size:24px; }
+  .settings-grid { grid-template-columns:1fr; }
+  table { font-size:12px; }
+  th, td { padding:8px 10px; }
+  .detail-panel { width:100%; }
+  .mobile-menu-btn { display:flex !important; }
+}
+.mobile-menu-btn {
+  display:none; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12);
+  color:var(--cream); width:36px; height:36px; border-radius:var(--r);
+  align-items:center; justify-content:center; cursor:pointer; font-size:18px;
+  margin-right:8px;
+}
+.mobile-overlay {
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:199;
+}
+.mobile-overlay.show { display:block; }
+</style>
+</head>
+<body>
+
+<!-- ════════════ AUTH SCREEN ════════════ -->
+<div id="authScreen">
+  <div class="auth-card">
+
+    <div class="auth-logo">
+      <div class="auth-logo-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M12 2L8 8H4l4 4-1.5 6L12 15l5.5 3L16 12l4-4h-4L12 2z"/></svg>
+      </div>
+      <div class="auth-logo-text">ROCKET CITY BANNER</div>
+      <div class="auth-logo-sub">Admin Portal</div>
+    </div>
+
+    <!-- Step indicators -->
+    <div class="auth-step-indicator" id="stepIndicator">
+      <div class="auth-step active" id="step1dot"></div>
+      <div class="auth-step" id="step2dot"></div>
+      <div class="auth-step" id="step3dot"></div>
+    </div>
+
+    <!-- STEP 1: Password login -->
+    <div id="loginPanel">
+      <div class="auth-title">Secure Admin Login</div>
+      <div class="security-badge">
+        <span>🔒</span>
+        <span>Two-factor authentication required for all admin access.</span>
+      </div>
+      <div class="auth-field">
+        <label>Email Address</label>
+        <input type="email" id="loginEmail" placeholder="admin@rocketcitybanner.com" autocomplete="username">
+        <div class="auth-err" id="loginEmailErr">Enter a valid email address.</div>
+      </div>
+      <div class="auth-field">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password"
+               onkeydown="if(event.key==='Enter')submitLogin()">
+        <div class="auth-err" id="loginErr"></div>
+      </div>
+      <button class="auth-submit" onclick="submitLogin()" id="loginBtn">Sign In</button>
+    </div>
+
+    <!-- STEP 2a: 2FA TOTP verify -->
+    <div id="twoFAPanel" style="display:none;">
+      <div class="lock-icon">🔐</div>
+      <div class="auth-title">Enter Authenticator Code</div>
+      <p style="font-size:13px;color:rgba(245,240,232,0.5);text-align:center;margin-bottom:20px;line-height:1.6;">
+        Open Google Authenticator or Authy and enter the 6-digit code for Rocket City Banner.
+      </p>
+      <div class="otp-inputs" id="otpInputs">
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+      </div>
+      <div class="auth-err" id="otpErr" style="text-align:center;"></div>
+      <button class="auth-submit" onclick="submitTwoFA()" id="twoFABtn">Verify Code</button>
+      <button class="auth-back" onclick="backToLogin()">← Back to login</button>
+    </div>
+
+    <!-- STEP 2b: First-time 2FA Setup -->
+    <div id="setupPanel" style="display:none;">
+      <div class="auth-title">Set Up Two-Factor Authentication</div>
+      <p style="font-size:13px;color:rgba(245,240,232,0.55);text-align:center;margin-bottom:16px;line-height:1.6;">
+        Scan this QR code with <strong style="color:var(--cream);">Google Authenticator</strong> or <strong style="color:var(--cream);">Authy</strong>.
+      </p>
+      <div class="qr-container" id="qrContainer"></div>
+      <div style="font-size:11px;color:rgba(245,240,232,0.4);text-align:center;margin-bottom:6px;">Or enter manually:</div>
+      <div class="manual-key" id="manualKey">Loading...</div>
+      <p style="font-size:12px;color:rgba(245,240,232,0.4);text-align:center;margin-bottom:20px;">
+        After scanning, enter the 6-digit code below to confirm setup.
+      </p>
+      <div class="otp-inputs" id="setupOtpInputs">
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
+      </div>
+      <div class="auth-err" id="setupOtpErr" style="text-align:center;"></div>
+      <button class="auth-submit" onclick="submitSetup2FA()">Confirm & Activate 2FA</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════ APP SHELL ════════════ -->
+<div id="appShell">
+
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2L8 8H4l4 4-1.5 6L12 15l5.5 3L16 12l4-4h-4L12 2z"/></svg>
+      </div>
+      <div>
+        <div class="sidebar-logo-text">Rocket City</div>
+        <div class="sidebar-logo-sub">Admin Portal</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <div class="nav-item active" onclick="showPage('dashboard',this)">
+        <span class="nav-item-icon">📊</span> Dashboard
+      </div>
+      <div class="nav-section-label">Orders</div>
+      <div class="nav-item" onclick="showPage('orders',this)">
+        <span class="nav-item-icon">📋</span> All Orders
+        <span class="nav-badge" id="pendingBadge" style="display:none;"></span>
+      </div>
+      <div class="nav-item" onclick="showPage('production',this)">
+        <span class="nav-item-icon">🖨️</span> In Production
+      </div>
+      <div class="nav-section-label">Customers</div>
+      <div class="nav-item" onclick="showPage('customers',this)">
+        <span class="nav-item-icon">👥</span> Customers
+      </div>
+      <div class="nav-section-label">Reports</div>
+      <div class="nav-item" onclick="showPage('discounts',this)">
+        <span class="nav-item-icon">🏷️</span> Discount Codes
+      </div>
+      <div class="nav-item" onclick="showPage('reports',this)">
+        <span class="nav-item-icon">📈</span> Sales &amp; Margin
+      </div>
+      <div class="nav-item" onclick="showPage('taxreport',this)">
+        <span class="nav-item-icon">🏛️</span> Sales Tax
+      </div>
+      <div class="nav-section-label">System</div>
+      <div class="nav-item" onclick="showPage('settings',this)">
+        <span class="nav-item-icon">⚙️</span> Settings
+      </div>
+      <div class="nav-item" onclick="showPage('health',this)">
+        <span class="nav-item-icon">🩺</span> System Health
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="admin-chip">
+        <div class="admin-avatar" id="adminAvatar">A</div>
+        <div>
+          <div class="admin-name" id="adminNameDisplay">Admin</div>
+          <div class="admin-role">🔐 2FA Active</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="logout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div id="main">
+    <div id="topbar">
+      <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleSidebar()">☰</button>
+      <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+      <div class="topbar-search">
+        <span style="font-size:14px;opacity:0.4;">🔍</span>
+        <input type="text" placeholder="Search orders, customers..." id="globalSearch" oninput="handleGlobalSearch(this.value)">
+      </div>
+      <button class="refresh-btn" onclick="refreshCurrentPage()" title="Refresh">↻</button>
+    </div>
+
+    <div id="content">
+
+      <!-- ─── DASHBOARD ─── -->
+      <div class="page active" id="page-dashboard">
+        <div class="stat-grid" id="dashStats"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;" id="dashGridRow">
+          <div>
+            <div class="table-card">
+              <div class="table-header">
+                <div class="table-title">Revenue — Last 30 Days</div>
+              </div>
+              <div style="padding:16px 20px 8px;">
+                <div class="trend-bar-chart" id="trendChart"></div>
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:rgba(245,240,232,0.3);margin-top:4px;" id="trendLabels"></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="table-card">
+              <div class="table-header">
+                <div class="table-title">Order Status</div>
+              </div>
+              <div style="padding:16px 20px;" id="statusBreakdown"></div>
+            </div>
+          </div>
+        </div>
+        <div class="table-card">
+          <div class="table-header">
+            <div class="table-title">Recent Orders</div>
+            <div class="table-actions">
+              <button class="btn-sm btn-sm-ghost" onclick="showPage('orders',document.querySelector('.nav-item:nth-child(4)'))">View All</button>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table id="recentOrdersTable">
+              <thead><tr>
+                <th>Order #</th><th>Storefront</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th><th></th>
+              </tr></thead>
+              <tbody id="recentOrdersBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── ALL ORDERS ─── -->
+      <div class="page" id="page-orders">
+        <div class="filter-bar">
+          <select class="filter-select" id="orderStatusFilter" onchange="loadOrders()">
+            <option value="all">All Statuses</option>
+            <option value="order_placed">Order Placed</option>
+            <option value="approval_sent">Approval Sent</option>
+            <option value="order_approved">Order Approved</option>
+            <option value="printed">Printed</option>
+            <option value="shipped">Shipped</option>
+            <option value="received">Received</option>
+            <option value="pending_payment">Pending Payment</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <div class="filter-search">
+            <span style="opacity:0.4;font-size:13px;">🔍</span>
+            <input type="text" placeholder="Search by order #, name, email..." id="orderSearch" oninput="debounceOrderSearch()">
+          </div>
+          <select class="filter-select" id="orderTenantFilter" onchange="loadOrders()" style="width:160px;" title="Filter by storefront">
+            <option value="all">All Storefronts</option>
+          </select>
+          <input type="date" class="filter-select" id="orderDateFrom" onchange="loadOrders()" style="width:150px;" title="From date">
+          <input type="date" class="filter-select" id="orderDateTo" onchange="loadOrders()" style="width:150px;" title="To date">
+          <span class="filter-count" id="orderCount"></span>
+        </div>
+        <div class="table-card">
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr>
+                <th>Order #</th><th>Storefront</th><th>Customer</th><th>Email</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="ordersTableBody"></tbody>
+            </table>
+          </div>
+          <div class="pagination" id="ordersPagination"></div>
+        </div>
+      </div>
+
+      <!-- ─── IN PRODUCTION ─── -->
+      <div class="page" id="page-production">
+        <div class="table-card">
+          <div class="table-header">
+            <div class="table-title">In Production</div>
+            <div class="table-actions">
+              <button class="btn-sm btn-sm-ghost" onclick="loadProduction()">↻ Refresh</button>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr>
+                <th>Order #</th><th>Customer</th><th>Banners</th><th>In-Hands Date</th><th>Status</th><th>Drive</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="productionBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── CUSTOMERS ─── -->
+      <div class="page" id="page-customers">
+        <div class="filter-bar">
+          <div class="filter-search">
+            <span style="opacity:0.4;font-size:13px;">🔍</span>
+            <input type="text" placeholder="Search customers..." id="customerSearch" oninput="debounceCustomerSearch()">
+          </div>
+          <span class="filter-count" id="customerCount"></span>
+        </div>
+        <div class="table-card">
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr>
+                <th>Name</th><th>Email</th><th>Phone</th><th>Orders</th><th>Total Spend</th><th>Joined</th><th></th>
+              </tr></thead>
+              <tbody id="customersBody"></tbody>
+            </table>
+          </div>
+          <div class="pagination" id="customersPagination"></div>
+        </div>
+      </div>
+
+      <!-- ─── SETTINGS ─── -->
+      <div class="page" id="page-settings">
+        <div class="settings-grid" id="settingsGrid">
+          <div class="settings-card">
+            <div class="settings-card-title">🏢 Business Info</div>
+            <div class="s-field"><label>Business Name</label><input type="text" id="s-businessName"></div>
+            <div class="s-field"><label>Email</label><input type="email" id="s-businessEmail"></div>
+            <div class="s-field"><label>Phone</label><input type="tel" id="s-businessPhone"></div>
+            <div class="s-field"><label>Address</label><input type="text" id="s-businessAddress"></div>
+            <div class="s-field"><label>Order # Prefix</label><input type="text" id="s-orderPrefix" maxlength="6"></div>
+            <div class="s-field"><label>Tax Rate (%)</label><input type="number" id="s-taxRate" min="0" max="20" step="0.1"></div>
+            <button class="auth-submit" style="margin-top:8px;" onclick="saveSettings()">Save Business Settings</button>
+          </div>
+          <div class="settings-card">
+            <div class="settings-card-title">🔗 Integrations</div>
+            <div class="s-toggle">
+              <span class="s-toggle-label">Google Drive Upload</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="s-googleDriveEnabled" onchange="saveSetting('googleDriveEnabled',this.checked)">
+                <div class="toggle-track"></div>
+                <div class="toggle-thumb"></div>
+              </label>
+            </div>
+            <div class="s-field" style="margin-top:12px;">
+              <label>Drive Folder ID</label>
+              <input type="text" id="s-googleDriveFolderId" placeholder="Folder ID from Drive URL">
+            </div>
+            <div class="s-toggle">
+              <span class="s-toggle-label">Email Notifications</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="s-emailNotifications" onchange="saveSetting('emailNotifications',this.checked)">
+                <div class="toggle-track"></div>
+                <div class="toggle-thumb"></div>
+              </label>
+            </div>
+            <button class="btn-sm btn-sm-ghost" style="margin-top:16px;width:100%;" onclick="saveDriveSettings()">Save Drive Settings</button>
+            <div class="settings-card-title" style="margin-top:24px;">🔐 Security</div>
+            <div style="font-size:13px;color:rgba(245,240,232,0.5);margin-bottom:12px;line-height:1.6;">
+              Two-factor authentication is <strong style="color:#2aaa5c;">active</strong>. Required for all admin logins.
+            </div>
+            <button class="btn-sm btn-sm-ghost" style="width:100%;" onclick="showToast('Reset 2FA via npm run setup-admin on the server.','warn')">Reset 2FA (requires server access)</button>
+          </div>
+          <div class="settings-card">
+            <div class="settings-card-title">💳 Stripe Configuration</div>
+            <div style="font-size:13px;color:rgba(245,240,232,0.5);margin-bottom:14px;line-height:1.6;">
+              Stripe keys are configured via environment variables on the server for security. They cannot be modified through the portal UI.
+            </div>
+            <div id="stripeStatus"></div>
+            <div style="font-family:var(--font-mono);font-size:12px;background:rgba(0,0,0,0.2);padding:12px;border-radius:var(--r);color:rgba(245,240,232,0.5);margin-top:12px;">
+              STRIPE_SECRET_KEY=sk_live_...<br>
+              STRIPE_PUBLISHABLE_KEY=pk_live_...<br>
+              STRIPE_WEBHOOK_SECRET=whsec_...
+            </div>
+          </div>
+          <div class="settings-card">
+            <div class="settings-card-title">📦 Storage Info</div>
+            <div style="font-size:13px;color:rgba(245,240,232,0.5);line-height:1.7;" id="storageInfo">Loading...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── HEALTH ─── -->
+      <div class="page" id="page-health">
+        <div style="max-width:640px;">
+          <div class="table-card" style="padding:24px;">
+            <div class="settings-card-title" style="font-family:var(--font-cond);font-size:16px;font-weight:700;color:var(--cream);text-transform:uppercase;letter-spacing:1px;margin-bottom:20px;">🩺 System Health</div>
+            <div id="healthChecks">
+              <div style="color:rgba(245,240,232,0.4);font-size:14px;">Running checks...</div>
+            </div>
+            <button class="btn-sm btn-sm-ghost" style="margin-top:20px;" onclick="loadHealth()">↻ Run Checks Again</button>
+          </div>
+          <div class="table-card" style="margin-top:20px;">
+            <div class="table-header"><div class="table-title">Recent Access Log</div></div>
+            <div style="padding:16px;overflow-x:auto;max-height:320px;overflow-y:auto;">
+              <div id="logLines" style="font-family:var(--font-mono);font-size:11px;color:rgba(245,240,232,0.45);line-height:1.8;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ─── REPORTS ─── -->
+      <div class="page" id="page-reports">
+
+        <!-- Controls -->
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:22px;">
+          <div>
+            <div style="font-family:var(--font-cond);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.4);margin-bottom:5px;">Report Type</div>
+            <select class="filter-select" id="reportType" onchange="toggleReportControls()" style="width:200px;">
+              <option value="mtd">Month to Date (MTD)</option>
+              <option value="monthly">Full Month</option>
+              <option value="daily">Single Day</option>
+              <option value="margin">Margin — Date Range</option>
+            </select>
+          </div>
+          <div id="ctrl-month" style="display:flex;gap:8px;">
+            <div>
+              <div style="font-family:var(--font-cond);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.4);margin-bottom:5px;">Month</div>
+              <select class="filter-select" id="reportMonth" style="width:130px;">
+                <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+                <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+                <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+                <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+              </select>
+            </div>
+            <div>
+              <div style="font-family:var(--font-cond);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.4);margin-bottom:5px;">Year</div>
+              <select class="filter-select" id="reportYear" style="width:100px;" id="reportYear"></select>
+            </div>
+          </div>
+          <div id="ctrl-date" style="display:none;">
+            <div style="font-family:var(--font-cond);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.4);margin-bottom:5px;">Date</div>
+            <input type="date" class="filter-select" id="reportDate" style="width:160px;">
+          </div>
+          <div id="ctrl-range" style="display:none;gap:8px;align-items:flex-end;">
+            <div>
+              <div style="font-family:var(--font-cond);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.4);margin-bottom:5px;">From</div>
+              <input type="date" class="filter-select" id="reportFrom" style="width:150px;">
+            </div>
+            <div>
+              <div style="font-family:var(--font-cond);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.4);margin-bottom:5px;">To</div>
+              <input type="date" class="filter-select" id="reportTo" style="width:150px;">
+            </div>
+          </div>
+          <div>
+            <div style="font-family:var(--font-cond);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.4);margin-bottom:5px;">Storefront</div>
+            <select class="filter-select" id="reportTenant" style="width:160px;">
+              <option value="all">All Storefronts</option>
+            </select>
+          </div>
+          <button class="btn-sm btn-sm-primary" onclick="runReport()" style="height:36px;padding:0 20px;align-self:flex-end;">Run Report</button>
+          <button class="btn-sm btn-sm-ghost" id="csvBtn" onclick="downloadReportCSV()" style="height:36px;padding:0 16px;align-self:flex-end;display:none;">⬇ Export CSV</button>
+        </div>
+
+        <!-- KPI Summary Cards -->
+        <div class="stat-grid" id="reportKPIs" style="margin-bottom:20px;"></div>
+
+        <!-- Material Breakdown -->
+        <div id="reportMaterialSection" style="display:none;margin-bottom:20px;">
+          <div class="table-card">
+            <div class="table-header"><div class="table-title">By Material Type</div></div>
+            <div style="overflow-x:auto;"><table id="reportMaterialTable">
+              <thead><tr>
+                <th>Material</th><th>Units</th><th>Sq Ft Sold</th><th>Revenue</th><th>Material Cost</th><th>Gross Profit</th><th>Margin %</th>
+              </tr></thead>
+              <tbody id="reportMaterialBody"></tbody>
+            </table></div>
+          </div>
+        </div>
+
+        <!-- Daily Breakdown (monthly/MTD only) -->
+        <div id="reportDailySection" style="display:none;margin-bottom:20px;">
+          <div class="table-card">
+            <div class="table-header"><div class="table-title">Daily Breakdown</div></div>
+            <div style="overflow-x:auto;"><table>
+              <thead><tr>
+                <th>Date</th><th>Orders</th><th>Units</th><th>Revenue</th><th>Cost</th><th>Gross Profit</th><th>Margin %</th><th>Tax</th>
+              </tr></thead>
+              <tbody id="reportDailyBody"></tbody>
+            </table></div>
+          </div>
+        </div>
+
+        <!-- Order-level table -->
+        <div id="reportOrdersSection" style="display:none;">
+          <div class="table-card">
+            <div class="table-header">
+              <div class="table-title" id="reportOrdersTitle">Orders</div>
+            </div>
+            <div style="overflow-x:auto;"><table>
+              <thead><tr id="reportOrdersHead"></tr></thead>
+              <tbody id="reportOrdersBody"></tbody>
+            </table></div>
+          </div>
+        </div>
+
+        <div id="reportEmpty" style="text-align:center;padding:60px 0;color:rgba(245,240,232,0.3);">
+          <div style="font-size:48px;margin-bottom:12px;">📊</div>
+          <div style="font-family:var(--font-cond);font-size:16px;letter-spacing:1px;text-transform:uppercase;">Select a report type and click Run Report</div>
+        </div>
+      </div>
+
+      <!-- ─── TAX REPORT ─── -->
+      <div class="page" id="page-taxreport">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:22px;">
+          <div>
+            <div style="font-family:var(--font-cond);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.4);margin-bottom:5px;">Month</div>
+            <select class="filter-select" id="taxMonth" style="width:130px;">
+              <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+              <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+              <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+              <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-family:var(--font-cond);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.4);margin-bottom:5px;">Year</div>
+            <select class="filter-select" id="taxYear" style="width:100px;"></select>
+          </div>
+          <div>
+            <div style="font-family:var(--font-cond);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.4);margin-bottom:5px;">Storefront</div>
+            <select class="filter-select" id="taxTenant" style="width:160px;">
+              <option value="all">All Storefronts</option>
+            </select>
+          </div>
+          <button class="btn-sm btn-sm-primary" onclick="runTaxReport()" style="height:36px;padding:0 20px;align-self:flex-end;">Run Tax Report</button>
+          <button class="btn-sm btn-sm-ghost" id="taxCsvBtn" onclick="downloadTaxCSV()" style="height:36px;display:none;padding:0 16px;align-self:flex-end;">⬇ Export CSV</button>
+        </div>
+
+        <div id="taxKPIs" class="stat-grid" style="margin-bottom:20px;"></div>
+
+        <div id="taxFilingBox" style="display:none;margin-bottom:20px;">
+          <div style="background:rgba(212,168,67,0.08);border:1px solid rgba(212,168,67,0.25);border-radius:var(--r-lg);padding:18px 22px;">
+            <div style="font-family:var(--font-cond);font-size:13px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">📋 Filing Breakdown — Madison, AL</div>
+            <div id="taxFilingDetail" style="font-size:14px;color:rgba(245,240,232,0.7);line-height:1.9;"></div>
+            <div id="taxFilingNote" style="font-size:12px;color:rgba(245,240,232,0.4);margin-top:10px;line-height:1.7;"></div>
+          </div>
+        </div>
+
+        <div id="taxOrdersSection" style="display:none;">
+          <div class="table-card">
+            <div class="table-header"><div class="table-title">Taxable Orders</div></div>
+            <div style="overflow-x:auto;"><table>
+              <thead><tr>
+                <th>Order #</th><th>Date</th><th>Customer</th><th>Ship State</th>
+                <th>Taxable Amount</th><th>Rate</th><th>Tax Collected</th>
+                <th>AL State (4%)</th><th>Madison City (3.5%)</th><th>County EXC (1%)</th><th>County-Wide (0.5%)</th>
+              </tr></thead>
+              <tbody id="taxOrdersBody"></tbody>
+            </table></div>
+          </div>
+        </div>
+
+        <div id="taxEmpty" style="text-align:center;padding:60px 0;color:rgba(245,240,232,0.3);">
+          <div style="font-size:48px;margin-bottom:12px;">🏛️</div>
+          <div style="font-family:var(--font-cond);font-size:16px;letter-spacing:1px;text-transform:uppercase;">Select a month and click Run Tax Report</div>
+        </div>
+      </div>
+
+
+      <!-- ─── DISCOUNTS ─── -->
+      <div class="page" id="page-discounts">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+          <div style="font-family:var(--font-cond);font-size:14px;color:rgba(245,240,232,0.5);">Create and manage discount codes. Toggle a code inactive to disable it without deleting.</div>
+          <button class="btn-sm btn-sm-primary" onclick="openDiscountModal()">+ New Code</button>
+        </div>
+        <div class="table-card">
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr>
+                <th>Code</th><th>Type</th><th>Value</th><th>Storefront</th>
+                <th>Start</th><th>End</th><th>Used</th><th>Status</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="discountsBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Discount Modal -->
+      <div class="modal-overlay" id="discountModal">
+        <div class="modal-box" style="max-width:480px;">
+          <div class="modal-header">
+            <div class="modal-title" id="discountModalTitle">New Discount Code</div>
+            <button class="modal-close" onclick="closeDiscountModal()">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="field-row">
+              <div class="field">
+                <label class="s-field"><span class="rcb-s-label" style="font-family:var(--font-cond);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.4);margin-bottom:5px;display:block;">Code</span>
+                <input type="text" id="dc-code" placeholder="SUMMER20" style="width:100%;padding:9px 12px;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--cream);font-size:14px;text-transform:uppercase;"></label>
+              </div>
+              <div class="field">
+                <label style="font-family:var(--font-cond);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.4);margin-bottom:5px;display:block;">Type</label>
+                <div class="select-wrapper" style="position:relative;">
+                  <select id="dc-type" style="width:100%;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--cream);padding:9px 28px 9px 12px;font-size:14px;-webkit-appearance:none;">
+                    <option value="percent">Percent (%)</option>
+                    <option value="flat">Flat ($)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label style="font-family:var(--font-cond);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.4);margin-bottom:5px;display:block;">Value</label>
+                <input type="number" id="dc-value" placeholder="20" min="0" style="width:100%;padding:9px 12px;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--cream);font-size:14px;">
+              </div>
+              <div class="field">
+                <label style="font-family:var(--font-cond);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.4);margin-bottom:5px;display:block;">Min Order ($)</label>
+                <input type="number" id="dc-min" placeholder="0" min="0" style="width:100%;padding:9px 12px;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--cream);font-size:14px;">
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label style="font-family:var(--font-cond);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.4);margin-bottom:5px;display:block;">Start Date</label>
+                <input type="date" id="dc-start" style="width:100%;padding:9px 12px;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--cream);font-size:14px;">
+              </div>
+              <div class="field">
+                <label style="font-family:var(--font-cond);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.4);margin-bottom:5px;display:block;">End Date</label>
+                <input type="date" id="dc-end" style="width:100%;padding:9px 12px;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--cream);font-size:14px;">
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label style="font-family:var(--font-cond);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.4);margin-bottom:5px;display:block;">Max Uses</label>
+                <input type="number" id="dc-maxuses" placeholder="Unlimited" min="1" style="width:100%;padding:9px 12px;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--cream);font-size:14px;">
+              </div>
+              <div class="field">
+                <label style="font-family:var(--font-cond);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.4);margin-bottom:5px;display:block;">Storefront</label>
+                <div class="select-wrapper" style="position:relative;">
+                  <select id="dc-tenant" style="width:100%;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--cream);padding:9px 28px 9px 12px;font-size:14px;-webkit-appearance:none;">
+                    <option value="all">All Storefronts</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <label style="font-family:var(--font-cond);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.4);margin-bottom:5px;display:block;">Description (internal note)</label>
+              <input type="text" id="dc-desc" placeholder="e.g. Summer sale promo" style="width:100%;padding:9px 12px;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--cream);font-size:14px;">
+            </div>
+            <button class="pay-btn" onclick="saveDiscount()" style="margin-top:8px;">Save Code</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /appShell -->
+
+<!-- ORDER DETAIL PANEL -->
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+<div class="detail-panel" id="detailPanel">
+  <div class="panel-header">
+    <div class="panel-title" id="panelOrderNum">Order Details</div>
+    <button class="panel-close" onclick="closePanel()">✕</button>
+  </div>
+  <div class="panel-body" id="panelBody"></div>
+  <div class="panel-footer">
+    <select class="status-select" id="panelStatusSelect"></select>
+    <input type="text" class="status-select" id="panelTracking" placeholder="Tracking # (optional)" style="flex:1;">
+    <button class="panel-save-btn" onclick="saveOrderStatus()">Save</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="adminToast"><span id="adminToastMsg"></span></div>
+
+<script>
+// ═══════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════
+const API = '/api';
+let authToken = null;
+let currentPage = 'dashboard';
+let currentOrder = null;
+let orderSearchTimer = null;
+let customerSearchTimer = null;
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  // Check for saved session
+  const saved = sessionStorage.getItem('rcb_admin_token');
+  if (saved) {
+    authToken = saved;
+    initApp();
+  }
+  // Wire OTP input auto-advance
+  wireOtpInputs('otpInputs');
+  wireOtpInputs('setupOtpInputs');
+});
+
+function wireOtpInputs(containerId) {
+  const inputs = document.querySelectorAll(`#${containerId} .otp-input`);
+  inputs.forEach((inp, i) => {
+    inp.addEventListener('input', e => {
+      const val = e.target.value.replace(/\D/g,'');
+      e.target.value = val;
+      if (val && i < inputs.length-1) inputs[i+1].focus();
+    });
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !e.target.value && i > 0) inputs[i-1].focus();
+    });
+    inp.addEventListener('paste', e => {
+      e.preventDefault();
+      const pasted = (e.clipboardData.getData('text')||'').replace(/\D/g,'').slice(0,6);
+      pasted.split('').forEach((ch, j) => { if (inputs[j]) inputs[j].value = ch; });
+      if (inputs[pasted.length-1]) inputs[pasted.length-1].focus();
+    });
+  });
+}
+
+function getOtpValue(containerId) {
+  return Array.from(document.querySelectorAll(`#${containerId} .otp-input`)).map(i=>i.value).join('');
+}
+
+// ═══════════════════════════════════════════
+// AUTH FLOW
+// ═══════════════════════════════════════════
+async function submitLogin() {
+  const email    = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const err      = document.getElementById('loginErr');
+  const btn      = document.getElementById('loginBtn');
+
+  err.classList.remove('show');
+  if (!email || !password) { err.textContent='Email and password required.'; err.classList.add('show'); return; }
+
+  btn.disabled = true; btn.textContent = 'Signing in...';
+  try {
+    const res = await fetch(`${API}/auth/admin/login`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (!res.ok) { err.textContent = data.error || 'Login failed'; err.classList.add('show'); return; }
+
+    window._partialToken = data.partialToken;
+
+    if (data.requires2FASetup) {
+      await initSetup2FA();
+    } else {
+      // Go to 2FA verify
+      document.getElementById('loginPanel').style.display = 'none';
+      document.getElementById('twoFAPanel').style.display = 'block';
+      updateStepDots(2);
+      document.querySelector('#otpInputs .otp-input').focus();
+    }
+  } catch (e) {
+    err.textContent = 'Network error. Is the server running?';
+    err.classList.add('show');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Sign In';
+  }
+}
+
+async function initSetup2FA() {
+  const res  = await fetch(`${API}/auth/admin/setup-2fa`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ partialToken: window._partialToken })
+  });
+  const data = await res.json();
+  if (!res.ok) { alert(data.error); return; }
+
+  document.getElementById('loginPanel').style.display = 'none';
+  document.getElementById('setupPanel').style.display = 'block';
+  updateStepDots(2);
+
+  const qrEl = document.getElementById('qrContainer');
+  qrEl.innerHTML = `<img src="${data.qrCode}" alt="2FA QR Code">`;
+  document.getElementById('manualKey').textContent = data.manualKey;
+  wireOtpInputs('setupOtpInputs');
+  document.querySelector('#setupOtpInputs .otp-input').focus();
+}
+
+async function submitSetup2FA() {
+  const code = getOtpValue('setupOtpInputs');
+  const err  = document.getElementById('setupOtpErr');
+  err.classList.remove('show');
+  if (code.length < 6) { err.textContent='Enter the full 6-digit code.'; err.classList.add('show'); return; }
+
+  const res  = await fetch(`${API}/auth/admin/verify-2fa`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    credentials:'include',
+    body: JSON.stringify({ partialToken: window._partialToken, code })
+  });
+  const data = await res.json();
+  if (!res.ok) { err.textContent = data.error || 'Invalid code'; err.classList.add('show'); return; }
+
+  authToken = data.token;
+  sessionStorage.setItem('rcb_admin_token', authToken);
+  updateStepDots(3);
+  setTimeout(initApp, 300);
+}
+
+async function submitTwoFA() {
+  const code = getOtpValue('otpInputs');
+  const err  = document.getElementById('otpErr');
+  const btn  = document.getElementById('twoFABtn');
+  err.classList.remove('show');
+  if (code.length < 6) { err.textContent='Enter the full 6-digit code.'; err.classList.add('show'); return; }
+
+  btn.disabled=true; btn.textContent='Verifying...';
+  try {
+    const res  = await fetch(`${API}/auth/admin/verify-2fa`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      body: JSON.stringify({ partialToken: window._partialToken, code })
+    });
+    const data = await res.json();
+    if (!res.ok) { err.textContent = data.error || 'Invalid code'; err.classList.add('show'); return; }
+
+    authToken = data.token;
+    sessionStorage.setItem('rcb_admin_token', authToken);
+    updateStepDots(3);
+    setTimeout(initApp, 300);
+  } finally {
+    btn.disabled=false; btn.textContent='Verify Code';
+  }
+}
+
+function updateStepDots(active) {
+  [1,2,3].forEach(n => {
+    const el = document.getElementById(`step${n}dot`);
+    el.className = 'auth-step' + (n < active ? ' done' : n === active ? ' active' : '');
+  });
+}
+
+function backToLogin() {
+  document.getElementById('twoFAPanel').style.display='none';
+  document.getElementById('loginPanel').style.display='block';
+  updateStepDots(1);
+}
+
+// ═══════════════════════════════════════════
+// APP INIT
+// ═══════════════════════════════════════════
+async function initApp() {
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('appShell').classList.add('visible');
+
+  // Load admin info
+  try {
+    const res  = await apiFetch('/auth/admin/me');
+    const data = await res.json();
+    if (data.email) {
+      const initials = data.email.charAt(0).toUpperCase();
+      document.getElementById('adminAvatar').textContent = initials;
+      document.getElementById('adminNameDisplay').textContent = data.email.split('@')[0];
+    }
+  } catch {}
+
+  loadDashboard();
+}
+
+// ═══════════════════════════════════════════
+// API HELPER
+// ═══════════════════════════════════════════
+function apiFetch(path, options={}) {
+  return fetch(`${API}${path}`, {
+    ...options,
+    credentials:'include',
+    headers: {
+      'Content-Type':'application/json',
+      ...(authToken ? { Authorization:`Bearer ${authToken}` } : {}),
+      ...(options.headers||{}),
+    }
+  });
+}
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+function showPage(name, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`page-${name}`).classList.add('active');
+  if (el) el.classList.add('active');
+  currentPage = name;
+
+  const titles = { dashboard:'Dashboard', orders:'All Orders', production:'In Production', customers:'Customers', settings:'Settings', health:'System Health', reports:'Sales & Margin Reports', taxreport:'Sales Tax Report', discounts:'Discount Codes' };
+  document.getElementById('topbarTitle').textContent = titles[name] || name;
+
+  if (name==='dashboard')  loadDashboard();
+  if (name==='orders')     loadOrders();
+  if (name==='production') loadProduction();
+  if (name==='customers')  loadCustomers();
+  if (name==='settings')   loadSettings();
+  if (name==='health')     loadHealth();
+  if (name==='reports')    loadReportsPage();
+  if (name==='taxreport')  loadTaxReportPage();
+  if (name==='discounts')  loadDiscountsPage();
+}
+
+function refreshCurrentPage() { showPage(currentPage); }
+
+function handleGlobalSearch(val) {
+  if (val.length > 2) {
+    document.getElementById('orderSearch').value = val;
+    const ordersNav = document.querySelectorAll('.nav-item')[3];
+    showPage('orders', ordersNav);
+  }
+}
+
+// ═══════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════
+async function loadDashboard() {
+  try {
+    const res  = await apiFetch('/admin/dashboard');
+    const data = await res.json();
+    if (!res.ok) { if (res.status===401) logout(); return; }
+
+    const s = data.summary;
+
+    // Stats
+    document.getElementById('dashStats').innerHTML = `
+      <div class="stat-card highlight">
+        <div class="stat-label">Total Revenue</div>
+        <div class="stat-val">${fmt$(s.totalRevenue)}</div>
+        <div class="stat-sub">${s.totalOrders} total orders</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Today's Orders</div>
+        <div class="stat-val">${s.todayOrders}</div>
+        <div class="stat-sub">Avg order: ${fmt$(s.avgOrderValue)}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">In Production</div>
+        <div class="stat-val">${s.inProduction}</div>
+        <div class="stat-sub">${s.readyToShip} ready to ship</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Customers</div>
+        <div class="stat-val">${s.totalCustomers}</div>
+        <div class="stat-sub">${s.pendingPayment} pending payment</div>
+      </div>
+    `;
+
+    // Update badge
+    if (s.pendingPayment > 0) {
+      document.getElementById('pendingBadge').textContent = s.pendingPayment;
+      document.getElementById('pendingBadge').style.display = 'flex';
+    }
+
+    // Trend chart
+    const trend     = data.trend || [];
+    const maxRev    = Math.max(...trend.map(t=>t.revenue), 1);
+    const chartEl   = document.getElementById('trendChart');
+    const labelsEl  = document.getElementById('trendLabels');
+    chartEl.innerHTML = trend.map((t,i) => {
+      const h = Math.max(4, Math.round((t.revenue/maxRev)*80));
+      return `<div class="trend-bar" style="height:${h}px;" title="${t.date}: ${fmt$(t.revenue)}"></div>`;
+    }).join('');
+    // Show every 5th label
+    labelsEl.innerHTML = trend.map((t,i) => `<span style="flex:1;text-align:center;">${i%5===0?t.date:''}</span>`).join('');
+
+    // Status breakdown
+    const sb = data.summary.statusBreakdown || {};
+    const total = Object.values(sb).reduce((a,b)=>a+b,0)||1;
+    document.getElementById('statusBreakdown').innerHTML = Object.entries(sb)
+      .filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).map(([k,v]) => `
+        <div style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+            <span style="color:rgba(245,240,232,0.6);text-transform:capitalize;">${k.replace('_',' ')}</span>
+            <span style="color:var(--cream);font-weight:600;">${v}</span>
+          </div>
+          <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px;">
+            <div style="height:4px;background:var(--red);border-radius:2px;width:${Math.round(v/total*100)}%;"></div>
+          </div>
+        </div>`).join('');
+
+    // Recent orders table
+    document.getElementById('recentOrdersBody').innerHTML = (data.recentOrders||[]).map(o => `
+      <tr>
+        <td class="td-mono"><a href="#" onclick="openOrderDetail('${o.id}');return false;" style="color:var(--gold);">${o.orderNumber}</a></td>
+        <td class="td-name">${esc(o.customerName)}</td>
+        <td>${o.itemCount} banner${o.itemCount!==1?'s':''}</td>
+        <td>${fmt$(o.total)}</td>
+        <td>${statusBadge(o.status)}</td>
+        <td style="font-size:12px;color:rgba(245,240,232,0.4);">${fmtDate(o.createdAt)}</td>
+        <td class="td-action"><button class="btn-sm btn-sm-ghost" onclick="openOrderDetail('${o.id}')">View</button></td>
+      </tr>`).join('');
+
+  } catch (e) {
+    console.error('[Dashboard]', e);
+  }
+}
+
+// ═══════════════════════════════════════════
+// ORDERS
+// ═══════════════════════════════════════════
+let ordersPage = 1;
+async function loadOrders() {
+  const status = document.getElementById('orderStatusFilter')?.value || 'all';
+  const search = document.getElementById('orderSearch')?.value || '';
+  const from   = document.getElementById('orderDateFrom')?.value || '';
+  const to     = document.getElementById('orderDateTo')?.value || '';
+  const params = new URLSearchParams({ status, search, from, to, page:ordersPage, limit:25 });
+
+  try {
+    const res  = await apiFetch(`/orders?${params}`);
+    const data = await res.json();
+    if (!res.ok) return;
+
+    document.getElementById('orderCount').textContent = `${data.total} order${data.total!==1?'s':''}`;
+    document.getElementById('ordersTableBody').innerHTML = (data.orders||[]).map(o => `
+      <tr>
+        <td class="td-mono" style="color:var(--gold);">${o.orderNumber}</td>
+        <td class="td-name">${esc(o.customer?.firstName||'')} ${esc(o.customer?.lastName||'')}</td>
+        <td style="font-size:12px;">${esc(o.customer?.email||'')}</td>
+        <td>${(o.items||[]).length}</td>
+        <td>${fmt$(o.total)}</td>
+        <td>${statusBadge(o.status)}</td>
+        <td style="font-size:12px;color:rgba(245,240,232,0.4);">${fmtDate(o.createdAt)}</td>
+        <td class="td-action"><button class="btn-sm btn-sm-ghost" onclick="openOrderDetail('${o.id}')">View →</button></td>
+      </tr>`).join('') || '<tr><td colspan="8" style="text-align:center;color:rgba(245,240,232,0.3);padding:32px;">No orders found.</td></tr>';
+
+    // Pagination
+    renderPagination('ordersPagination', data.page, data.pages, (p) => { ordersPage=p; loadOrders(); });
+  } catch(e) { console.error('[Orders]', e); }
+}
+
+function debounceOrderSearch() {
+  clearTimeout(orderSearchTimer);
+  orderSearchTimer = setTimeout(() => { ordersPage=1; loadOrders(); }, 350);
+}
+
+// ═══════════════════════════════════════════
+// PRODUCTION
+// ═══════════════════════════════════════════
+async function loadProduction() {
+  try {
+    const [r1,r2,r3] = await Promise.all([
+      apiFetch(`/orders?status=order_approved&limit=50`).then(r=>r.json()),
+      apiFetch(`/orders?status=order_placed&limit=50`).then(r=>r.json()),
+      apiFetch(`/orders?status=printed&limit=50`).then(r=>r.json()),
+    ]);
+    const rows = [...(r1.orders||[]),...(r2.orders||[]),...(r3.orders||[])];
+
+    document.getElementById('productionBody').innerHTML = rows.map(o => `
+      <tr>
+        <td class="td-mono" style="color:var(--gold);">${o.orderNumber}</td>
+        <td class="td-name">${esc(o.customer?.firstName||'')} ${esc(o.customer?.lastName||'')}</td>
+        <td>${(o.items||[]).map(i=>`<div style="font-size:12px;">${esc(i.name)}</div>`).join('')}</td>
+        <td style="font-size:12px;">${(o.items||[]).map(i=>i.date||'').filter(Boolean).join(', ')}</td>
+        <td>${statusBadge(o.status)}</td>
+        <td>${o.driveFolderLink ? `<a href="${o.driveFolderLink}" target="_blank" style="color:var(--gold);font-size:12px;">Open Drive ↗</a>` : '<span style="color:rgba(245,240,232,0.3);font-size:12px;">—</span>'}</td>
+        <td class="td-action">
+          <button class="btn-sm btn-sm-ghost" onclick="sendProof('${o.id}')" style="margin-right:4px;">📧 Send Proof</button>
+          <button class="btn-sm btn-sm-primary" onclick="quickStatus('${o.id}','printed')" style="margin-right:4px;">→ Printed</button>
+          <button class="btn-sm btn-sm-success" onclick="quickStatus('${o.id}','shipped')">→ Shipped</button>
+        </td>
+      </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:rgba(245,240,232,0.3);padding:32px;">No orders in production.</td></tr>';
+  } catch(e) { console.error('[Production]', e); }
+}
+
+async function quickStatus(orderId, status) {
+  const res = await apiFetch(`/orders/${orderId}/status`, {
+    method:'PATCH', body:JSON.stringify({ status })
+  });
+  if (res.ok) { showToast(`Status updated to ${status.replace('_',' ')}`); loadProduction(); }
+}
+
+// ═══════════════════════════════════════════
+// ORDER DETAIL PANEL
+// ═══════════════════════════════════════════
+async function openOrderDetail(id) {
+  try {
+    const res  = await apiFetch(`/orders/${id}`);
+    const o    = await res.json();
+    if (!res.ok) return;
+    currentOrder = o;
+
+    document.getElementById('panelOrderNum').textContent = o.orderNumber;
+
+    const body = document.getElementById('panelBody');
+    body.innerHTML = `
+      <div class="panel-section">
+        <div class="panel-section-title">Customer</div>
+        <div class="panel-row"><span class="panel-row-label">Name</span><span class="panel-row-val">${esc(o.customer?.firstName)} ${esc(o.customer?.lastName)}</span></div>
+        <div class="panel-row"><span class="panel-row-label">Email</span><span class="panel-row-val" style="font-size:12px;">${esc(o.customer?.email)}</span></div>
+        <div class="panel-row"><span class="panel-row-label">Phone</span><span class="panel-row-val">${esc(o.customer?.phone||'—')}</span></div>
+        <div class="panel-row"><span class="panel-row-label">Address</span><span class="panel-row-val" style="font-size:12px;">${fmtAddress(o.customer?.address)}</span></div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-section-title">Order Items (${(o.items||[]).length})</div>
+        ${(o.items||[]).map(item => `
+          <div style="background:rgba(255,255,255,0.04);border-radius:6px;padding:12px;margin-bottom:8px;">
+            <div style="font-weight:600;color:var(--cream);font-size:14px;margin-bottom:4px;">${esc(item.name)}</div>
+            <div style="font-size:12px;color:rgba(245,240,232,0.5);line-height:1.7;">
+              ${esc(item.materialName)} · ${item.width}"×${item.height}" · ${item.sqft?.toFixed(2)} sqft<br>
+              ${item.doubleSided?'Double-sided · ':''}Grommets: ${item.grommet?.replace('_',' ')}<br>
+              Qty: ${item.qty} · In-hands: ${item.date||'—'}<br>
+              ${item.fileNames?.length ? 'Files: ' + item.fileNames.join(', ') : ''}
+            </div>
+            <div style="margin-top:6px;font-family:var(--font-cond);font-size:16px;font-weight:700;color:var(--gold);">$${(item.total||0).toFixed(2)}</div>
+          </div>`).join('')}
+      </div>
+      <div class="panel-section">
+        <div class="panel-section-title">Financials</div>
+        <div class="panel-row"><span class="panel-row-label">Subtotal</span><span class="panel-row-val">${fmt$(o.subtotal)}</span></div>
+        ${o.tax > 0 ? `<div class="panel-row"><span class="panel-row-label">Tax</span><span class="panel-row-val">${fmt$(o.tax)}</span></div>` : ''}
+        <div class="panel-row"><span class="panel-row-label" style="font-weight:700;color:var(--cream);">Total</span><span class="panel-row-val" style="color:var(--gold);font-family:var(--font-display);font-size:20px;">${fmt$(o.total)}</span></div>
+      </div>
+      ${o.driveFolderLink ? `<div class="panel-section"><div class="panel-section-title">Artwork Files</div><a href="${o.driveFolderLink}" target="_blank" class="btn-sm btn-sm-ghost" style="display:inline-flex;align-items:center;gap:6px;">📁 Open Google Drive Folder ↗</a></div>` : ''}
+      <div class="panel-section">
+        <div class="panel-section-title">Notes</div>
+        <textarea id="panelNotes" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--cream);padding:10px;font-size:13px;resize:vertical;min-height:80px;">${esc(o.notes||'')}</textarea>
+        <button class="btn-sm btn-sm-ghost" style="margin-top:8px;" onclick="saveNotes()">Save Notes</button>
+      </div>
+      <div class="panel-section" style="margin-bottom:0;">
+        <div class="panel-section-title">Timeline</div>
+        ${fmtTimeline(o)}
+      </div>
+    `;
+
+    // Status select
+    const sel = document.getElementById('panelStatusSelect');
+    const statuses = ['order_placed','approval_sent','order_approved','printed','shipped','received','cancelled','refunded'];
+    sel.innerHTML = statuses.map(s => `<option value="${s}" ${o.status===s?'selected':''}>${s.replace('_',' ')}</option>`).join('');
+    if (o.trackingNumber) document.getElementById('panelTracking').value = o.trackingNumber;
+
+    document.getElementById('detailPanel').classList.add('open');
+    document.getElementById('overlay').classList.add('show');
+  } catch(e) { console.error('[Panel]', e); }
+}
+
+function closePanel() {
+  document.getElementById('detailPanel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+  currentOrder = null;
+  // Reset panel footer visibility for next open
+  // Add Send Proof button if not already there
+  const footer = document.querySelector('.panel-footer');
+  if (footer && !document.getElementById('proofBtn')) {
+    const pb = document.createElement('button');
+    pb.id = 'proofBtn'; pb.className = 'btn-sm btn-sm-ghost';
+    pb.textContent = '📧 Send Proof';
+    pb.onclick = () => sendProof(o.id);
+    footer.insertBefore(pb, footer.firstChild);
+  } else if (document.getElementById('proofBtn')) {
+    document.getElementById('proofBtn').onclick = () => sendProof(o.id);
+  }
+  document.getElementById('panelStatusSelect').style.display = '';
+  document.getElementById('panelTracking').style.display = '';
+  document.querySelector('.panel-save-btn').style.display = '';
+}
+
+async function saveOrderStatus() {
+  if (!currentOrder) return;
+  const status   = document.getElementById('panelStatusSelect').value;
+  const tracking = document.getElementById('panelTracking').value.trim();
+  const res = await apiFetch(`/orders/${currentOrder.id}/status`, {
+    method:'PATCH', body:JSON.stringify({ status, trackingNumber:tracking })
+  });
+  if (res.ok) { showToast('Order updated!'); closePanel(); refreshCurrentPage(); }
+  else { const d=await res.json(); showToast(d.error||'Error','err'); }
+}
+
+async function saveNotes() {
+  if (!currentOrder) return;
+  const notes = document.getElementById('panelNotes').value;
+  const res = await apiFetch(`/orders/${currentOrder.id}/notes`, {
+    method:'PATCH', body:JSON.stringify({ notes })
+  });
+  if (res.ok) showToast('Notes saved!');
+}
+
+function fmtTimeline(o) {
+  const events = [
+    { key:'createdAt',       label:'Order Placed',       icon:'🛒' },
+    { key:'paidAt',          label:'Payment Confirmed',   icon:'💳' },
+    { key:'inProductionAt',  label:'In Production',       icon:'🖨️' },
+    { key:'qualityCheckAt',  label:'Quality Check',       icon:'✅' },
+    { key:'shippedAt',       label:'Shipped',             icon:'📦' },
+    { key:'deliveredAt',     label:'Delivered',           icon:'🎉' },
+    { key:'cancelledAt',     label:'Cancelled',           icon:'❌' },
+  ].filter(e => o[e.key]);
+  if (!events.length) return '<div style="font-size:13px;color:rgba(245,240,232,0.3);">No timeline events yet.</div>';
+  return events.map(e => `
+    <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+      <span style="font-size:16px;">${e.icon}</span>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--cream);">${e.label}</div>
+        <div style="font-size:11px;color:rgba(245,240,232,0.35);">${fmtDate(o[e.key])}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════
+// CUSTOMERS
+// ═══════════════════════════════════════════
+let customersPage = 1;
+async function loadCustomers() {
+  const search = document.getElementById('customerSearch')?.value || '';
+  const params = new URLSearchParams({ search, page:customersPage, limit:25 });
+  try {
+    const res  = await apiFetch(`/customers?${params}`);
+    const data = await res.json();
+    if (!res.ok) return;
+    document.getElementById('customerCount').textContent = `${data.total} customer${data.total!==1?'s':''}`;
+    document.getElementById('customersBody').innerHTML = (data.customers||[]).map(c => `
+      <tr>
+        <td class="td-name">${esc(c.firstName)} ${esc(c.lastName)}</td>
+        <td style="font-size:12px;">${esc(c.email)}</td>
+        <td style="font-size:13px;">${esc(c.phone||'—')}</td>
+        <td>${c.orderCount}</td>
+        <td style="color:var(--gold);font-family:var(--font-cond);font-size:16px;">${fmt$(c.totalSpend)}</td>
+        <td style="font-size:12px;color:rgba(245,240,232,0.4);">${fmtDate(c.createdAt)}</td>
+        <td class="td-action"><button class="btn-sm btn-sm-ghost" onclick="viewCustomer('${c.id}')">View</button></td>
+      </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:rgba(245,240,232,0.3);padding:32px;">No customers yet.</td></tr>';
+    renderPagination('customersPagination', data.page, data.pages, (p)=>{ customersPage=p; loadCustomers(); });
+  } catch(e) { console.error('[Customers]', e); }
+}
+
+function debounceCustomerSearch() {
+  clearTimeout(customerSearchTimer);
+  customerSearchTimer = setTimeout(() => { customersPage=1; loadCustomers(); }, 350);
+}
+
+async function viewCustomer(id) {
+  const res = await apiFetch(`/customers/${id}`);
+  const c   = await res.json();
+  if (!res.ok) return;
+
+  document.getElementById('panelOrderNum').textContent = `${c.firstName} ${c.lastName}`;
+  document.getElementById('panelBody').innerHTML = `
+    <div class="panel-section">
+      <div class="panel-section-title">Contact Info</div>
+      <div class="panel-row"><span class="panel-row-label">Email</span><span class="panel-row-val" style="font-size:12px;">${esc(c.email)}</span></div>
+      <div class="panel-row"><span class="panel-row-label">Phone</span><span class="panel-row-val">${esc(c.phone||'—')}</span></div>
+      <div class="panel-row"><span class="panel-row-label">Joined</span><span class="panel-row-val">${fmtDate(c.createdAt)}</span></div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-title">Orders (${(c.orders||[]).length})</div>
+      ${(c.orders||[]).map(o=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <div>
+            <div style="font-family:var(--font-mono);font-size:12px;color:var(--gold);">${o.orderNumber}</div>
+            <div style="font-size:12px;color:rgba(245,240,232,0.4);">${fmtDate(o.createdAt)}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            ${statusBadge(o.status)}
+            <span style="font-family:var(--font-cond);font-weight:700;color:var(--cream);">${fmt$(o.total)}</span>
+          </div>
+        </div>`).join('')||'<div style="color:rgba(245,240,232,0.3);font-size:13px;">No orders yet.</div>'}
+    </div>`;
+  document.getElementById('panelStatusSelect').style.display='none';
+  document.getElementById('panelTracking').style.display='none';
+  document.querySelector('.panel-save-btn').style.display='none';
+  document.getElementById('detailPanel').classList.add('open');
+  document.getElementById('overlay').classList.add('show');
+}
+
+// ═══════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════
+async function loadSettings() {
+  try {
+    const res  = await apiFetch('/settings');
+    const data = await res.json();
+    document.getElementById('s-businessName').value    = data.businessName||'';
+    document.getElementById('s-businessEmail').value   = data.businessEmail||'';
+    document.getElementById('s-businessPhone').value   = data.businessPhone||'';
+    document.getElementById('s-businessAddress').value = data.businessAddress||'';
+    document.getElementById('s-orderPrefix').value     = data.orderPrefix||'RCB';
+    document.getElementById('s-taxRate').value         = data.taxRate||0;
+    document.getElementById('s-googleDriveEnabled').checked  = !!data.googleDriveEnabled;
+    document.getElementById('s-emailNotifications').checked  = !!data.emailNotifications;
+    document.getElementById('s-googleDriveFolderId').value   = data.googleDriveFolderId||'';
+
+    document.getElementById('stripeStatus').innerHTML = data.stripeSecretConfigured
+      ? '<div class="health-indicator health-ok">✅ Stripe Secret Key configured</div>'
+      : '<div class="health-indicator health-err">❌ Stripe not configured — add keys to .env</div>';
+
+    document.getElementById('storageInfo').innerHTML = `
+      <strong style="color:var(--cream);">Local Upload Buffer</strong><br>
+      Artwork files are temporarily stored locally before upload to Google Drive. Local temp files are removed after successful Drive upload.<br><br>
+      <strong style="color:var(--cream);">Drive Folder</strong><br>
+      Folder ID: <span style="font-family:var(--font-mono);color:var(--gold);">${data.googleDriveFolderId||'Not configured'}</span><br><br>
+      <strong style="color:var(--cream);">Data Store</strong><br>
+      JSON flat-file store · /data directory on server.
+    `;
+  } catch(e) { console.error('[Settings]', e); }
+}
+
+async function saveSettings() {
+  const body = {
+    businessName:    document.getElementById('s-businessName').value,
+    businessEmail:   document.getElementById('s-businessEmail').value,
+    businessPhone:   document.getElementById('s-businessPhone').value,
+    businessAddress: document.getElementById('s-businessAddress').value,
+    orderPrefix:     document.getElementById('s-orderPrefix').value,
+    taxRate:         parseFloat(document.getElementById('s-taxRate').value)||0,
+  };
+  const res = await apiFetch('/settings', { method:'PUT', body:JSON.stringify(body) });
+  if (res.ok) showToast('Settings saved!');
+  else showToast('Error saving settings.','err');
+}
+
+async function saveDriveSettings() {
+  const body = {
+    googleDriveEnabled:  document.getElementById('s-googleDriveEnabled').checked,
+    googleDriveFolderId: document.getElementById('s-googleDriveFolderId').value.trim(),
+  };
+  const res = await apiFetch('/settings', { method:'PUT', body:JSON.stringify(body) });
+  if (res.ok) showToast('Drive settings saved!');
+  else showToast('Error saving settings.','err');
+}
+
+async function saveSetting(key, value) {
+  await apiFetch('/settings', { method:'PUT', body:JSON.stringify({ [key]:value }) });
+}
+
+// ═══════════════════════════════════════════
+// HEALTH
+// ═══════════════════════════════════════════
+async function loadHealth() {
+  document.getElementById('healthChecks').innerHTML = '<div style="color:rgba(245,240,232,0.4);font-size:14px;">Running checks...</div>';
+  try {
+    const res  = await apiFetch('/admin/system-health');
+    const data = await res.json();
+    const checks = data.checks || {};
+
+    const labels = {
+      googleDrive: 'Google Drive',
+      email:       'Email (SMTP)',
+      stripe:      'Stripe API',
+      localStorage:'Local Storage',
+    };
+
+    document.getElementById('healthChecks').innerHTML = Object.entries(checks).map(([k,v]) => {
+      const ok  = v.connected !== false;
+      const cls = ok ? 'health-ok' : 'health-err';
+      const ico = ok ? '✅' : '❌';
+      return `<div class="health-indicator ${cls}">${ico} <strong>${labels[k]||k}</strong>${v.error ? ` — ${v.error}` : ' — Connected'}</div>`;
+    }).join('');
+
+    // Access log
+    const logRes = await apiFetch('/admin/logs');
+    const logData = await logRes.json();
+    document.getElementById('logLines').textContent = (logData.lines||[]).join('\n') || '(No log entries yet)';
+  } catch(e) {
+    document.getElementById('healthChecks').innerHTML = `<div class="health-indicator health-err">❌ Error loading health data: ${e.message}</div>`;
+  }
+}
+
+// ═══════════════════════════════════════════
+// LOGOUT
+// ═══════════════════════════════════════════
+async function logout() {
+  await fetch(`${API}/auth/admin/logout`, { method:'POST', credentials:'include' }).catch(()=>{});
+  sessionStorage.removeItem('rcb_admin_token');
+  authToken = null;
+  location.reload();
+}
+
+// ═══════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════
+function fmt$(n) {
+  return '$' + (n||0).toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:2 });
+}
+
+function fmtDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+function fmtAddress(addr) {
+  if (!addr) return '—';
+  return [addr.line1, addr.line2, addr.city && `${addr.city}, ${addr.state} ${addr.zip}`].filter(Boolean).join('<br>');
+}
+
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+const STATUS_CLASS = {
+  // Legacy
+  paid:'badge-paid', in_production:'badge-production',
+  quality_check:'badge-quality', delivered:'badge-delivered',
+  // New workflow
+  order_placed:   'badge-order_placed',
+  approval_sent:  'badge-approval_sent',
+  order_approved: 'badge-order_approved',
+  printed:        'badge-printed',
+  received:       'badge-received',
+  // Always present
+  pending_payment: 'badge-pending',
+  shipped:         'badge-shipped',
+  cancelled:       'badge-cancelled',
+  payment_failed:  'badge-failed',
+  refunded:        'badge-refunded',
+};
+
+function statusBadge(status) {
+  const cls   = STATUS_CLASS[status] || 'badge-pending';
+  const label = (status||'unknown').replace('_',' ');
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+function renderPagination(containerId, page, pages, cb) {
+  const el = document.getElementById(containerId);
+  if (!el || pages <= 1) { if(el) el.innerHTML=''; return; }
+  let html = `<button class="page-btn" ${page<=1?'disabled':''} onclick="(${cb.toString()})(${page-1})">‹</button>`;
+  for (let i=1; i<=pages; i++) {
+    if (pages>7 && Math.abs(i-page)>2 && i!==1 && i!==pages) {
+      if (i===2||i===pages-1) html+='<span style="color:rgba(245,240,232,0.3);padding:0 4px;">…</span>';
+      continue;
+    }
+    html += `<button class="page-btn ${i===page?'active':''}" onclick="(${cb.toString()})(${i})">${i}</button>`;
+  }
+  html += `<button class="page-btn" ${page>=pages?'disabled':''} onclick="(${cb.toString()})(${page+1})">›</button>`;
+  el.innerHTML = html;
+}
+
+let toastTimer;
+function showToast(msg, type='ok') {
+  const t = document.getElementById('adminToast');
+  document.getElementById('adminToastMsg').textContent = msg;
+  t.className = `toast show ${type}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+// ═══════════════════════════════════════════
+// REPORTING ENGINE
+// ═══════════════════════════════════════════
+
+let lastReportData = null;
+let lastTaxData    = null;
+
+// Populate year dropdowns on load
+function initReportYears() {
+  const now  = new Date();
+  const year = now.getFullYear();
+  ['reportYear','taxYear'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    sel.innerHTML = '';
+    for (let y = year; y >= year - 4; y--) {
+      sel.innerHTML += `<option value="${y}" ${y===year?'selected':''}>${y}</option>`;
+    }
+  });
+  // Default current month
+  const m = now.getMonth() + 1;
+  ['reportMonth','taxMonth'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = m;
+  });
+  // Default date
+  const dateEl = document.getElementById('reportDate');
+  if (dateEl) dateEl.value = now.toISOString().split('T')[0];
+  // Default range: start of current month → today
+  const fromEl = document.getElementById('reportFrom');
+  const toEl   = document.getElementById('reportTo');
+  if (fromEl) fromEl.value = `${year}-${String(m).padStart(2,'0')}-01`;
+  if (toEl)   toEl.value   = now.toISOString().split('T')[0];
+}
+
+function loadReportsPage()  { initReportYears(); toggleReportControls(); }
+function loadTaxReportPage(){ initReportYears(); }
+
+function toggleReportControls() {
+  const type = document.getElementById('reportType')?.value;
+  document.getElementById('ctrl-month').style.display  = ['monthly','mtd'].includes(type) ? 'flex' : 'none';
+  document.getElementById('ctrl-date').style.display   = type === 'daily'  ? 'block' : 'none';
+  document.getElementById('ctrl-range').style.display  = type === 'margin' ? 'flex'  : 'none';
+}
+
+async function runReport() {
+  const type  = document.getElementById('reportType').value;
+  const month = document.getElementById('reportMonth').value;
+  const year  = document.getElementById('reportYear').value;
+  const date  = document.getElementById('reportDate').value;
+  const from  = document.getElementById('reportFrom').value;
+  const to    = document.getElementById('reportTo').value;
+
+  let url = '';
+  if (type === 'mtd')     url = `/api/reports/mtd`;
+  if (type === 'monthly') url = `/api/reports/monthly?year=${year}&month=${month}`;
+  if (type === 'daily')   url = `/api/reports/daily?date=${date}`;
+  if (type === 'margin')  url = `/api/reports/margin?from=${from}&to=${to}`;
+
+  try {
+    const res  = await apiFetch(url);
+    const data = await res.json();
+    if (!res.ok) { showToast(data.error || 'Report failed', 'err'); return; }
+    lastReportData = data;
+    renderReport(data);
+    document.getElementById('csvBtn').style.display = 'inline-flex';
+  } catch(e) {
+    showToast('Network error running report', 'err');
+  }
+}
+
+function renderReport(data) {
+  document.getElementById('reportEmpty').style.display = 'none';
+  const isSales  = ['daily','monthly','mtd'].includes(data.reportType);
+  const isMargin = data.reportType === 'margin';
+
+  // ── KPI Cards ──
+  document.getElementById('reportKPIs').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">Orders</div>
+      <div class="stat-val">${data.orderCount || 0}</div>
+      <div class="stat-sub">${data.units || 0} total units</div>
+    </div>
+    <div class="stat-card highlight">
+      <div class="stat-label">Revenue</div>
+      <div class="stat-val">${fmt$(data.revenue || 0)}</div>
+      <div class="stat-sub">Subtotal: ${fmt$(data.subtotal||0)}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Cost</div>
+      <div class="stat-val">${fmt$(data.totalCost || 0)}</div>
+      <div class="stat-sub">Mat: ${fmt$(data.materialCost||0)} · Ship: ${fmt$(data.shippingCost||0)}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Gross Profit</div>
+      <div class="stat-val" style="color:${(data.grossProfit||0) >= 0 ? '#2aaa5c' : '#ff6b6b'}">${fmt$(data.grossProfit || 0)}</div>
+      <div class="stat-sub">Margin: <strong style="color:${marginColor(data.marginPct||0)};">${(data.marginPct||0).toFixed(1)}%</strong></div>
+    </div>
+    ${isSales ? `
+    <div class="stat-card">
+      <div class="stat-label">Tax Collected</div>
+      <div class="stat-val">${fmt$(data.taxCollected||0)}</div>
+      <div class="stat-sub">Madison, AL 9.0%</div>
+    </div>` : ''}
+    ${isMargin && data.topOrders?.length ? `
+    <div class="stat-card">
+      <div class="stat-label">Best Margin Order</div>
+      <div class="stat-val" style="font-size:22px;color:#2aaa5c;">${(data.topOrders[0].marginPct||0).toFixed(1)}%</div>
+      <div class="stat-sub">${esc(data.topOrders[0].orderNumber)}</div>
+    </div>` : ''}
+  `;
+
+  // ── Material Breakdown ──
+  const matData = data.materialBreakdown || [];
+  if (matData.length > 0) {
+    document.getElementById('reportMaterialSection').style.display = 'block';
+    document.getElementById('reportMaterialBody').innerHTML = matData.map(r => `
+      <tr>
+        <td class="td-name">${esc(r.material)}</td>
+        <td>${r.units}</td>
+        <td>${(r.sqft||0).toFixed(2)}</td>
+        <td style="color:var(--gold);font-family:var(--font-cond);font-weight:700;">${fmt$(r.revenue||0)}</td>
+        <td>${fmt$(r.cost||0)}</td>
+        <td style="color:${(r.profit||0)>=0?'#2aaa5c':'#ff6b6b'};">${fmt$(r.profit||0)}</td>
+        <td><span style="font-family:var(--font-cond);font-weight:700;color:${marginColor(r.marginPct||0)};">${(r.marginPct||0).toFixed(1)}%</span></td>
+      </tr>`).join('');
+  } else {
+    document.getElementById('reportMaterialSection').style.display = 'none';
+  }
+
+  // ── Daily Breakdown (monthly/MTD only) ──
+  const daily = data.dailyBreakdown || [];
+  if (daily.length) {
+    document.getElementById('reportDailySection').style.display = 'block';
+    document.getElementById('reportDailyBody').innerHTML = daily.map(d => `
+      <tr>
+        <td class="td-mono">${d.date}</td>
+        <td>${d.orderCount}</td>
+        <td>${d.units||0}</td>
+        <td style="color:var(--gold);font-family:var(--font-cond);font-weight:700;">${fmt$(d.revenue)}</td>
+        <td>${fmt$(d.totalCost||0)}</td>
+        <td style="color:${(d.grossProfit||0)>=0?'#2aaa5c':'#ff6b6b'};">${fmt$(d.grossProfit||0)}</td>
+        <td><span style="font-family:var(--font-cond);font-weight:700;color:${marginColor(d.marginPct||0)};">${(d.marginPct||0).toFixed(1)}%</span></td>
+        <td>${fmt$(d.tax||0)}</td>
+      </tr>`).join('');
+  } else {
+    document.getElementById('reportDailySection').style.display = 'none';
+  }
+
+  // ── Orders Table ──
+  const orders = data.orders || [];
+  if (orders.length) {
+    document.getElementById('reportOrdersSection').style.display = 'block';
+    const titles = {
+      daily:   'Orders — ' + (data.dateLabel || data.date),
+      monthly: 'Orders — ' + data.monthLabel,
+      mtd:     'Orders — MTD ' + data.monthLabel + (data.mtdThrough ? ' (through '+data.mtdThrough+')' : ''),
+      margin:  'Orders — Margin Detail (' + data.dateRange + ')',
+    };
+    document.getElementById('reportOrdersTitle').textContent = titles[data.reportType] || 'Orders';
+
+    document.getElementById('reportOrdersHead').innerHTML = `
+      <th>Order #</th><th>Date</th><th>Customer</th><th>Status</th>
+      <th>Units</th><th>Revenue</th><th>Mat. Cost</th><th>Ship Cost</th>
+      <th>Total Cost</th><th>Profit</th><th>Margin %</th>
+      ${isSales ? '<th>Tax</th>' : ''}
+    `;
+    document.getElementById('reportOrdersBody').innerHTML = orders.map(o => `
+      <tr>
+        <td class="td-mono" style="color:var(--gold);">${o.orderNumber}</td>
+        <td class="td-mono" style="font-size:12px;">${o.date}</td>
+        <td>${esc(o.customerName)}</td>
+        <td>${statusBadge(o.status)}</td>
+        <td>${o.units}</td>
+        <td>${fmt$(o.revenue)}</td>
+        <td style="font-size:12px;">${fmt$(o.materialCost)}</td>
+        <td style="font-size:12px;">${fmt$(o.shippingCost)}</td>
+        <td style="font-size:12px;">${fmt$(o.totalCost)}</td>
+        <td style="color:${(o.grossProfit||0)>=0?'#2aaa5c':'#ff6b6b'};font-weight:600;">${fmt$(o.grossProfit)}</td>
+        <td><span style="font-family:var(--font-cond);font-weight:700;color:${marginColor(o.marginPct||0)};">${(o.marginPct||0).toFixed(1)}%</span></td>
+        ${isSales ? `<td style="font-size:12px;">${fmt$(o.taxCollected||0)}</td>` : ''}
+      </tr>`).join('');
+  } else {
+    document.getElementById('reportOrdersSection').style.display = 'none';
+    document.getElementById('reportEmpty').style.display = 'block';
+    document.getElementById('reportEmpty').querySelector('div:last-child').textContent = 'No orders found for this period.';
+  }
+}
+
+async function downloadReportCSV() {
+  const type  = document.getElementById('reportType').value;
+  const month = document.getElementById('reportMonth').value;
+  const year  = document.getElementById('reportYear').value;
+  const date  = document.getElementById('reportDate').value;
+  const from  = document.getElementById('reportFrom').value;
+  const to    = document.getElementById('reportTo').value;
+
+  let url = '';
+  if (type === 'mtd')     url = `/api/reports/mtd?format=csv`;
+  if (type === 'monthly') url = `/api/reports/monthly?year=${year}&month=${month}&format=csv`;
+  if (type === 'daily')   url = `/api/reports/daily?date=${date}&format=csv`;
+  if (type === 'margin')  url = `/api/reports/margin?from=${from}&to=${to}&format=csv`;
+
+  window.location.href = url + `&token=${authToken}`;
+}
+
+// ─── TAX REPORT ──────────────────────────────────────
+async function runTaxReport() {
+  const month = document.getElementById('taxMonth').value;
+  const year  = document.getElementById('taxYear').value;
+  try {
+    const res  = await apiFetch(`/reports/tax?year=${year}&month=${month}`);
+    const data = await res.json();
+    if (!res.ok) { showToast(data.error || 'Tax report failed', 'err'); return; }
+    lastTaxData = data;
+    renderTaxReport(data);
+    document.getElementById('taxCsvBtn').style.display = 'inline-flex';
+  } catch(e) {
+    showToast('Network error', 'err');
+  }
+}
+
+function renderTaxReport(data) {
+  document.getElementById('taxEmpty').style.display = 'none';
+  const f = data.filing || {};
+
+  document.getElementById('taxKPIs').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">Total Orders</div>
+      <div class="stat-val">${f.totalOrders || 0}</div>
+      <div class="stat-sub">${f.taxableOrders||0} taxable · ${f.exemptOrders||0} exempt</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Gross Sales</div>
+      <div class="stat-val">${fmt$(f.grossSales||0)}</div>
+      <div class="stat-sub">All orders incl. tax</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Taxable Amount</div>
+      <div class="stat-val">${fmt$(f.taxableSubtotal||0)}</div>
+      <div class="stat-sub">Pre-tax subtotal</div>
+    </div>
+    <div class="stat-card highlight">
+      <div class="stat-label">Total Tax Collected</div>
+      <div class="stat-val">${fmt$(f.totalTaxCollected||0)}</div>
+      <div class="stat-sub">${f.combinedRate||'9.0%'} combined rate</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">AL State (4%)</div>
+      <div class="stat-val">${fmt$(f.alStateTax||0)}</div>
+      <div class="stat-sub">Remit to ADOR</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Madison City (4.5%)</div>
+      <div class="stat-val">${fmt$(f.madisonCityTax||0)}</div>
+      <div class="stat-sub">Remit to City of Madison</div>
+    </div>
+  `;
+
+  document.getElementById('taxFilingBox').style.display = 'block';
+  document.getElementById('taxFilingDetail').innerHTML = `
+    <strong style="color:var(--cream);">Period:</strong> ${data.monthLabel}<br>
+    <strong style="color:var(--cream);">Jurisdiction:</strong> ${f.filingJurisdiction||'City of Madison, Alabama'}<br>
+    <strong style="color:var(--cream);">Combined Rate:</strong> ${f.combinedRate} (AL State ${f.alStateRate} + Madison City ${f.madisonCityRate} + County EXC ${f.madisonCountyExcRate} + County-Wide ${f.madisonCountyCwRate})<br>
+    <strong style="color:var(--cream);">Gross Sales:</strong> ${fmt$(f.grossSales||0)}<br>
+    <strong style="color:var(--cream);">Taxable Subtotal:</strong> ${fmt$(f.taxableSubtotal||0)}<br>
+    <strong style="color:var(--cream);">Total Tax Collected:</strong> ${fmt$(f.totalTaxCollected||0)}<br>
+    <strong style="color:var(--cream);">→ AL State (4.0%):</strong> ${fmt$(f.alStateTax||0)} → Alabama Department of Revenue<br>
+    <strong style="color:var(--cream);">→ Madison City (3.5%):</strong> ${fmt$(f.madisonCityTax||0)} → City of Madison<br>
+    <strong style="color:var(--cream);">→ County EXC CL HSV (1.0%):</strong> ${fmt$(f.madisonCountyExcTax||0)} → Madison County Revenue<br>
+    <strong style="color:var(--cream);">→ County-Wide (0.5%):</strong> ${fmt$(f.madisonCountyCwTax||0)} → Madison County Revenue
+  `;
+  document.getElementById('taxFilingNote').textContent = f.note || '';
+
+  const orders = data.orders || [];
+  document.getElementById('taxOrdersSection').style.display = orders.length ? 'block' : 'none';
+  document.getElementById('taxOrdersBody').innerHTML = orders.map(o => `
+    <tr>
+      <td class="td-mono" style="color:var(--gold);">${o.orderNumber}</td>
+      <td class="td-mono" style="font-size:12px;">${o.date}</td>
+      <td>${esc(o.customerName)}</td>
+      <td style="font-family:var(--font-cond);font-weight:700;">${o.shipState||'AL'}</td>
+      <td>${fmt$(o.subtotal)}</td>
+      <td style="font-family:var(--font-cond);color:var(--gold);">${o.taxRate||'—'}</td>
+      <td style="font-weight:600;color:var(--cream);">${fmt$(o.taxCollected)}</td>
+      <td style="font-size:12px;">${fmt$(o.statePortion)}</td>
+      <td style="font-size:12px;">${fmt$(o.cityPortion)}</td>
+      <td style="font-size:12px;">${fmt$(o.countyExcPortion||0)}</td>
+      <td style="font-size:12px;">${fmt$(o.countyCwPortion||0)}</td>
+    </tr>`).join('') || '<tr><td colspan="9" style="text-align:center;color:rgba(245,240,232,0.3);padding:24px;">No taxable orders this period.</td></tr>';
+}
+
+async function downloadTaxCSV() {
+  const month = document.getElementById('taxMonth').value;
+  const year  = document.getElementById('taxYear').value;
+  window.location.href = `/api/reports/tax?year=${year}&month=${month}&format=csv&token=${authToken}`;
+}
+
+// ─── Helpers ─────────────────────────────────────────
+function marginColor(pct) {
+  if (pct >= 50) return '#2aaa5c';
+  if (pct >= 30) return '#d4a843';
+  return '#ff6b6b';
+}
+
+// ═══════════════════════════════════════════════════════
+// MULTI-TENANT SUPPORT
+// ═══════════════════════════════════════════════════════
+let allTenants = [];
+
+async function loadTenants() {
+  try {
+    const res  = await apiFetch('/tenant/all');
+    const data = await res.json();
+    if (!res.ok) return;
+    allTenants = data;
+    populateTenantDropdowns(data);
+  } catch(e) { /* non-blocking */ }
+}
+
+function populateTenantDropdowns(tenants) {
+  const dropdownIds = ['orderTenantFilter','reportTenant','taxTenant'];
+  dropdownIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    // Keep "All Storefronts" option, add tenant options
+    el.innerHTML = '<option value="all">All Storefronts</option>' +
+      tenants.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+  });
+}
+
+function tenantPill(tenantId, tenantName) {
+  const cls = `tenant-${tenantId||'default'}`;
+  const label = tenantName || tenantId || 'Unknown';
+  return `<span class="tenant-pill ${allTenants.find(t=>t.id===tenantId) ? cls : 'tenant-default'}">${label}</span>`;
+}
+
+// ── Patch loadOrders to include tenant filter ──
+const _origLoadOrders = loadOrders;
+loadOrders = async function() {
+  const status   = document.getElementById('orderStatusFilter')?.value || 'all';
+  const search   = document.getElementById('orderSearch')?.value || '';
+  const from     = document.getElementById('orderDateFrom')?.value || '';
+  const to       = document.getElementById('orderDateTo')?.value || '';
+  const tenant   = document.getElementById('orderTenantFilter')?.value || 'all';
+  const params   = new URLSearchParams({ status, search, from, to, tenant, page:ordersPage, limit:25 });
+
+  try {
+    const res  = await apiFetch(`/orders?${params}`);
+    const data = await res.json();
+    if (!res.ok) return;
+
+    document.getElementById('orderCount').textContent = `${data.total} order${data.total!==1?'s':''}`;
+    document.getElementById('ordersTableBody').innerHTML = (data.orders||[]).map(o => `
+      <tr>
+        <td class="td-mono" style="color:var(--gold);">${o.orderNumber}</td>
+        <td>${tenantPill(o.tenantId, o.tenantName)}</td>
+        <td class="td-name">${esc(o.customer?.firstName||'')} ${esc(o.customer?.lastName||'')}</td>
+        <td style="font-size:12px;">${esc(o.customer?.email||'')}</td>
+        <td>${(o.items||[]).length}</td>
+        <td>${fmt$(o.total)}</td>
+        <td>${statusBadge(o.status)}</td>
+        <td style="font-size:12px;color:rgba(245,240,232,0.4);">${fmtDate(o.createdAt)}</td>
+        <td class="td-action"><button class="btn-sm btn-sm-ghost" onclick="openOrderDetail('${o.id}')">View →</button></td>
+      </tr>`).join('') || '<tr><td colspan="9" style="text-align:center;color:rgba(245,240,232,0.3);padding:32px;">No orders found.</td></tr>';
+
+    renderPagination('ordersPagination', data.page, data.pages, (p) => { ordersPage=p; loadOrders(); });
+  } catch(e) { console.error('[Orders]', e); }
+};
+
+// ── Patch dashboard recent orders to include tenant pill ──
+const _origLoadDashboard = loadDashboard;
+loadDashboard = async function() {
+  await _origLoadDashboard();
+  // Re-patch recent orders body to add tenant pill after load
+  // (loadDashboard already renders — this is a best-effort enhancement)
+};
+
+// ── Patch runReport to pass tenant ──
+const _origRunReport = runReport;
+runReport = async function() {
+  const type   = document.getElementById('reportType').value;
+  const month  = document.getElementById('reportMonth').value;
+  const year   = document.getElementById('reportYear').value;
+  const date   = document.getElementById('reportDate').value;
+  const from   = document.getElementById('reportFrom').value;
+  const to     = document.getElementById('reportTo').value;
+  const tenant = document.getElementById('reportTenant')?.value || 'all';
+
+  let url = '';
+  if (type === 'mtd')     url = `/api/reports/mtd?tenant=${tenant}`;
+  if (type === 'monthly') url = `/api/reports/monthly?year=${year}&month=${month}&tenant=${tenant}`;
+  if (type === 'daily')   url = `/api/reports/daily?date=${date}&tenant=${tenant}`;
+  if (type === 'margin')  url = `/api/reports/margin?from=${from}&to=${to}&tenant=${tenant}`;
+
+  try {
+    const res  = await apiFetch(url);
+    const data = await res.json();
+    if (!res.ok) { showToast(data.error || 'Report failed', 'err'); return; }
+    lastReportData = data;
+    renderReport(data);
+    document.getElementById('csvBtn').style.display = 'inline-flex';
+  } catch(e) {
+    showToast('Network error running report', 'err');
+  }
+};
+
+// ── Patch runTaxReport to pass tenant ──
+const _origRunTax = runTaxReport;
+runTaxReport = async function() {
+  const month  = document.getElementById('taxMonth').value;
+  const year   = document.getElementById('taxYear').value;
+  const tenant = document.getElementById('taxTenant')?.value || 'all';
+  try {
+    const res  = await apiFetch(`/api/reports/tax?year=${year}&month=${month}&tenant=${tenant}`);
+    const data = await res.json();
+    if (!res.ok) { showToast(data.error || 'Tax report failed', 'err'); return; }
+    lastTaxData = data;
+    renderTaxReport(data);
+    document.getElementById('taxCsvBtn').style.display = 'inline-flex';
+  } catch(e) {
+    showToast('Network error', 'err');
+  }
+};
+
+// ── Add Storefronts page to admin settings ──
+async function loadStorefronts() {
+  const grid = document.getElementById('settingsGrid');
+  if (!grid) return;
+  // Add a tenant overview card if not already present
+  if (document.getElementById('tenantsCard')) return;
+  try {
+    const res  = await apiFetch('/tenant/all');
+    const data = await res.json();
+    if (!res.ok) return;
+
+    const card = document.createElement('div');
+    card.className = 'settings-card';
+    card.id = 'tenantsCard';
+    card.style.gridColumn = '1 / -1';
+    card.innerHTML = `
+      <div class="settings-card-title">🌐 Active Storefronts</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
+        ${data.map(t => `
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:var(--r);padding:14px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <span class="tenant-pill tenant-${t.id}" style="font-size:12px;">${t.name}</span>
+              <span style="font-size:11px;color:${t.active?'#2aaa5c':'rgba(245,240,232,0.3)'};">${t.active?'● Active':'○ Inactive'}</span>
+            </div>
+            <div style="font-size:12px;color:rgba(245,240,232,0.5);line-height:1.7;">
+              <strong style="color:var(--cream);">Prefix:</strong> ${t.orderPrefix}<br>
+              <strong style="color:var(--cream);">Domains:</strong> ${t.domains.filter(d=>!d.includes('localhost')).join(', ')||'localhost only'}<br>
+              <strong style="color:var(--cream);">Pricing:</strong>
+              ${Object.keys(t.pricing||{}).length ? Object.entries(t.pricing).map(([k,v])=>`${k}: $${v}`).join(' · ') : 'Default rates'}
+            </div>
+          </div>`).join('')}
+      </div>
+      <div style="font-size:12px;color:rgba(245,240,232,0.35);margin-top:14px;line-height:1.6;">
+        To add or modify storefronts, edit <code style="background:rgba(0,0,0,0.2);padding:1px 5px;border-radius:3px;">src/config/tenants.js</code> on the server and restart.
+      </div>
+    `;
+    grid.appendChild(card);
+  } catch(e) { /* non-blocking */ }
+}
+
+// Load tenants on app init
+const _origInitApp = initApp;
+initApp = async function() {
+  await _origInitApp();
+  await loadTenants();
+};
+
+// Load storefronts card when settings page opens
+const _origLoadSettings = loadSettings;
+loadSettings = async function() {
+  await _origLoadSettings();
+  await loadStorefronts();
+};
+
+// ═══════════════════════════════════════
+// MOBILE SIDEBAR
+// ═══════════════════════════════════════
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('mobile-open');
+  document.getElementById('mobileOverlay').classList.toggle('show');
+}
+
+// Close sidebar when nav item clicked on mobile
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => {
+    if (window.innerWidth <= 768) {
+      document.getElementById('sidebar').classList.remove('mobile-open');
+      document.getElementById('mobileOverlay').classList.remove('show');
+    }
+  });
+});
+
+// ═══════════════════════════════════════
+// DISCOUNT CODES
+// ═══════════════════════════════════════
+let editingDiscountId = null;
+
+async function loadDiscountsPage() {
+  try {
+    const res  = await apiFetch('/discounts');
+    const data = await res.json();
+    if (!res.ok) return;
+    // Populate tenant dropdown in modal
+    if (allTenants.length) {
+      const sel = document.getElementById('dc-tenant');
+      if (sel) {
+        sel.innerHTML = '<option value="all">All Storefronts</option>' +
+          allTenants.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+      }
+    }
+    renderDiscounts(data);
+  } catch(e) { console.error('[Discounts]', e); }
+}
+
+function renderDiscounts(codes) {
+  const tbody = document.getElementById('discountsBody');
+  if (!codes.length) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:rgba(245,240,232,0.3);padding:32px;">No discount codes yet. Click + New Code to create one.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = codes.map(d => {
+    const isActive = d.status === 'active';
+    const valLabel = d.discountType === 'percent' ? `${d.discountValue}%` : `$${d.discountValue.toFixed(2)}`;
+    return `<tr>
+      <td style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--gold);">${d.code}</td>
+      <td style="font-size:13px;text-transform:capitalize;">${d.discountType}</td>
+      <td style="font-family:var(--font-cond);font-size:16px;font-weight:700;color:var(--cream);">${valLabel}</td>
+      <td><span style="font-size:12px;">${d.tenantId === 'all' ? 'All' : d.tenantId}</span></td>
+      <td style="font-size:12px;color:rgba(245,240,232,0.5);">${d.startDate ? d.startDate.split('T')[0] : '—'}</td>
+      <td style="font-size:12px;color:rgba(245,240,232,0.5);">${d.endDate ? d.endDate.split('T')[0] : '—'}</td>
+      <td style="font-family:var(--font-cond);font-size:14px;">${d.usedCount}${d.maxUses ? '/'+d.maxUses : ''}</td>
+      <td><span class="badge ${isActive ? 'badge-order_approved' : 'badge-cancelled'}">${isActive ? 'active' : d.status}</span></td>
+      <td class="td-action" style="display:flex;gap:6px;flex-wrap:nowrap;">
+        <button class="btn-sm btn-sm-ghost" onclick="editDiscount(${JSON.stringify(JSON.stringify(d)).slice(1,-1)})">Edit</button>
+        <button class="btn-sm btn-sm-ghost" onclick="toggleDiscountActive('${d.id}',${!d.active})" style="color:${d.active?'#d4a843':'#2aaa5c'};">${d.active ? 'Disable' : 'Enable'}</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function openDiscountModal(prefill = null) {
+  editingDiscountId = prefill?.id || null;
+  document.getElementById('discountModalTitle').textContent = prefill ? 'Edit Discount Code' : 'New Discount Code';
+  document.getElementById('dc-code').value = prefill?.code || '';
+  document.getElementById('dc-type').value = prefill?.discountType || 'percent';
+  document.getElementById('dc-value').value = prefill?.discountValue || '';
+  document.getElementById('dc-min').value = prefill?.minOrderValue || '';
+  document.getElementById('dc-start').value = prefill?.startDate?.split('T')[0] || '';
+  document.getElementById('dc-end').value = prefill?.endDate?.split('T')[0] || '';
+  document.getElementById('dc-maxuses').value = prefill?.maxUses || '';
+  document.getElementById('dc-desc').value = prefill?.description || '';
+  if (document.getElementById('dc-tenant')) document.getElementById('dc-tenant').value = prefill?.tenantId || 'all';
+  document.getElementById('discountModal').classList.add('open');
+}
+
+function closeDiscountModal() {
+  document.getElementById('discountModal').classList.remove('open');
+  editingDiscountId = null;
+}
+
+function editDiscount(json) {
+  try { openDiscountModal(JSON.parse(json)); } catch(e) {}
+}
+
+async function saveDiscount() {
+  const body = {
+    code:          document.getElementById('dc-code').value.trim().toUpperCase(),
+    discountType:  document.getElementById('dc-type').value,
+    discountValue: parseFloat(document.getElementById('dc-value').value) || 0,
+    minOrderValue: parseFloat(document.getElementById('dc-min').value) || 0,
+    startDate:     document.getElementById('dc-start').value || null,
+    endDate:       document.getElementById('dc-end').value || null,
+    maxUses:       parseInt(document.getElementById('dc-maxuses').value) || null,
+    description:   document.getElementById('dc-desc').value.trim(),
+    tenantId:      document.getElementById('dc-tenant')?.value || 'all',
+  };
+  if (!body.code) { showToast('Code name required', 'err'); return; }
+  if (!body.discountValue) { showToast('Discount value required', 'err'); return; }
+
+  const url    = editingDiscountId ? `/discounts/${editingDiscountId}` : '/discounts';
+  const method = editingDiscountId ? 'PUT' : 'POST';
+  const res    = await apiFetch(url, { method, body: JSON.stringify(body) });
+  const data   = await res.json();
+  if (!res.ok) { showToast(data.error || 'Error saving code', 'err'); return; }
+  showToast(`Code ${body.code} saved!`);
+  closeDiscountModal();
+  loadDiscountsPage();
+}
+
+async function toggleDiscountActive(id, active) {
+  await apiFetch(`/discounts/${id}`, { method:'PUT', body:JSON.stringify({ active }) });
+  loadDiscountsPage();
+}
+
+// ═══════════════════════════════════════
+// PROOF SENDING FROM ORDER PANEL
+// ═══════════════════════════════════════
+async function sendProof(orderId) {
+  const notes = prompt('Add notes for the customer (optional):') || '';
+  if (notes === null) return; // cancelled
+  const res  = await apiFetch(`/proof/send/${orderId}`, {
+    method: 'POST',
+    body: JSON.stringify({ proofNotes: notes })
+  });
+  const data = await res.json();
+  if (!res.ok) { showToast(data.error || 'Failed to send proof', 'err'); return; }
+  showToast('✅ Proof email sent to customer!');
+  closePanel();
+  refreshCurrentPage();
+}
+
+</script>
+</body>
+</html>
