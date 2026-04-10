@@ -54,18 +54,36 @@ const corsOptions = {
 };
 
 // ── Middleware ────────────────────────────────────────
+// Relaxed CSP for admin portal and setup pages
+app.use((req, res, next) => {
+  if (req.path.startsWith('/admin') || req.path.startsWith('/api/setup')) {
+    res.setHeader('Content-Security-Policy',
+      "default-src 'self'; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com; " +
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; " +
+      "font-src 'self' https://fonts.gstatic.com data:; " +
+      "connect-src 'self' https://api.stripe.com; " +
+      "frame-src https://js.stripe.com; " +
+      "img-src 'self' data: blob:;"
+    );
+    return next();
+  }
+  next();
+});
+
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc:  ["'self'"],
-      scriptSrc:   ["'self'", "'unsafe-inline'"],
-      styleSrc:    ["'self'", "'unsafe-inline'", 'fonts.googleapis.com'],
-      fontSrc:     ["'self'", 'fonts.gstatic.com'],
-      connectSrc:  ["'self'", 'api.stripe.com'],
-      frameSrc:    ['js.stripe.com'],
+      scriptSrc:   ["'self'", "'unsafe-inline'", 'https://js.stripe.com', 'https://fonts.googleapis.com'],
+      styleSrc:    ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://fonts.gstatic.com'],
+      fontSrc:     ["'self'", 'https://fonts.gstatic.com', 'data:'],
+      connectSrc:  ["'self'", 'https://api.stripe.com'],
+      frameSrc:    ['https://js.stripe.com'],
       imgSrc:      ["'self'", 'data:', 'blob:'],
     }
-  }
+  },
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
 }));
 
 // Stripe webhook needs raw body — must come before json parser
