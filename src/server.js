@@ -45,6 +45,7 @@ const allowedOrigins = () => {
 
 const corsOptions = {
   origin: (origin, cb) => {
+    if (process.env.CORS_ALLOW_ALL === 'true') return cb(null, true);
     if (!origin) return cb(null, true);
     if (origin.endsWith('.vercel.app')) return cb(null, true);
     if (origin.endsWith('.railway.app')) return cb(null, true);
