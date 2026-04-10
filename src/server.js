@@ -61,6 +61,28 @@ const corsOptions = {
 };
 
 // ── Middleware ────────────────────────────────────────
+// CORS must come first — before helmet and everything else
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  const allowed = !origin
+    || origin.endsWith('.vercel.app')
+    || origin.endsWith('.railway.app')
+    || process.env.CORS_ALLOW_ALL === 'true'
+    || allowedOrigins().includes(origin);
+
+  if (allowed && origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Tenant-ID');
+  }
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+  next();
+});
+
 app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: false }));
 
 // Stripe webhook needs raw body — must come before json parser
