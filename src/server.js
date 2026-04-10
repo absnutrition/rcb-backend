@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────
-//  server.js — Application entry point
+//  server.js — Application entry point v2
 // ─────────────────────────────────────────────────────
 require('dotenv').config();
 
