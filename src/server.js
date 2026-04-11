@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────
-//  server.js — Application entry point v2
+//  server.js — Application entry point
 // ─────────────────────────────────────────────────────
 require('dotenv').config();
 
@@ -21,6 +21,7 @@ const PORT = process.env.PORT || 3001;
 
 // Trust Railway's proxy (required for rate limiter and correct IP detection)
 app.set('trust proxy', 1);
+
 // ── Directories ───────────────────────────────────────
 const UPLOAD_DIR = path.join(__dirname, '..', 'uploads');
 const LOG_DIR    = path.join(__dirname, '..', 'logs');
@@ -47,11 +48,17 @@ const allowedOrigins = () => {
 
 const corsOptions = {
   origin: (origin, cb) => {
+    // If CORS_ALLOW_ALL is set, allow everything (useful during setup)
     if (process.env.CORS_ALLOW_ALL === 'true') return cb(null, true);
+    // Allow requests with no origin (Postman, curl, same-origin)
     if (!origin) return cb(null, true);
+    // Allow all vercel.app preview URLs
     if (origin.endsWith('.vercel.app')) return cb(null, true);
+    // Allow all railway.app URLs (admin portal)
     if (origin.endsWith('.railway.app')) return cb(null, true);
+    // Allow configured origins
     if (allowedOrigins().includes(origin)) return cb(null, true);
+    // Log and block
     console.warn('[CORS] Blocked:', origin);
     cb(new Error(`CORS blocked: ${origin}`));
   },
@@ -77,6 +84,7 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Tenant-ID');
   }
 
+  // Handle preflight
   if (req.method === 'OPTIONS') {
     return res.status(204).end();
   }
@@ -84,6 +92,8 @@ app.use((req, res, next) => {
 });
 
 app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: false }));
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // Stripe webhook needs raw body — must come before json parser
 app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));

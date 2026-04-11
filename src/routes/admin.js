@@ -24,16 +24,16 @@ router.get('/dashboard', async (req, res) => {
     orders.forEach(o => { statusBreakdown[o.status] = (statusBreakdown[o.status]||0)+1; });
 
     res.json({
-  summary: {
-  totalOrders:    orders.length,
-  todayOrders:    orders.filter(o => new Date(o.created_at).toDateString() === new Date().toDateString()).length,
-  totalRevenue:   revenue,
-  totalCustomers: parseInt(custsR.rows[0].count),
-  avgOrderValue:  paid.length ? revenue/paid.length : 0,
-  pendingPayment: statusBreakdown['pending_payment']||0,
-  inProduction:   (statusBreakdown['order_approved']||0)+(statusBreakdown['printed']||0),
-  readyToShip:    statusBreakdown['printed']||0,
-},
+      summary: {
+        totalOrders:    orders.length,
+        todayOrders:    orders.filter(o => new Date(o.created_at).toDateString() === new Date().toDateString()).length,
+        totalRevenue:   revenue,
+        totalCustomers: parseInt(custsR.rows[0].count),
+        avgOrderValue:  paid.length ? revenue/paid.length : 0,
+        pendingPayment: statusBreakdown['pending_payment']||0,
+        inProduction:   (statusBreakdown['order_approved']||0)+(statusBreakdown['printed']||0),
+        readyToShip:    statusBreakdown['printed']||0,
+      },
       recentOrders: orders.slice(0,8).map(o=>({ orderNumber: o.order_number, status: o.status, customerName: `${o.customer?.firstName||''} ${o.customer?.lastName||''}`.trim(), total: +o.total, createdAt: o.created_at, itemCount: (o.items||[]).length })),
       trend,
       statusBreakdown,
