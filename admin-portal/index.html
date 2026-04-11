@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:;">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Portal — Rocket City Banner</title>
@@ -407,13 +408,6 @@ tr:hover td { background:rgba(255,255,255,0.025); }
 /* Overlay */
 .overlay { position:fixed; inset:0; background:rgba(10,22,40,0.6); z-index:400; display:none; }
 .overlay.show { display:block; }
-   .modal-overlay { display:none; position:fixed; inset:0; background:rgba(10,22,40,0.75); z-index:500; align-items:center; justify-content:center; padding:20px; }
-.modal-overlay.open { display:flex; }
-.modal-box { background:var(--surface); border-radius:10px; border:1px solid var(--border); max-width:520px; width:100%; max-height:90vh; overflow-y:auto; }
-.modal-header { display:flex; align-items:center; justify-content:space-between; padding:18px 22px; border-bottom:1px solid var(--border); }
-.modal-title { font-family:var(--font-cond); font-size:16px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--cream); }
-.modal-close { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); color:var(--cream); width:30px; height:30px; border-radius:50%; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center; }
-.modal-body { padding:22px; }
 
 /* Toast */
 .toast {
@@ -516,10 +510,10 @@ tr:hover td { background:rgba(255,255,255,0.025); }
       <div class="auth-field">
         <label>Password</label>
         <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password"
-               onkeydown="if(event.key==='Enter')submitLogin()">
+               id="loginPasswordInput">
         <div class="auth-err" id="loginErr"></div>
       </div>
-      <button class="auth-submit" onclick="submitLogin()" id="loginBtn">Sign In</button>
+      <button class="auth-submit" id="loginBtn">Sign In</button>
     </div>
 
     <!-- STEP 2a: 2FA TOTP verify -->
@@ -538,8 +532,8 @@ tr:hover td { background:rgba(255,255,255,0.025); }
         <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
       </div>
       <div class="auth-err" id="otpErr" style="text-align:center;"></div>
-      <button class="auth-submit" onclick="submitTwoFA()" id="twoFABtn">Verify Code</button>
-      <button class="auth-back" onclick="backToLogin()">← Back to login</button>
+      <button class="auth-submit" id="twoFABtn">Verify Code</button>
+      <button class="auth-back" id="backToLoginBtn">← Back to login</button>
     </div>
 
     <!-- STEP 2b: First-time 2FA Setup -->
@@ -563,7 +557,7 @@ tr:hover td { background:rgba(255,255,255,0.025); }
         <input class="otp-input" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]">
       </div>
       <div class="auth-err" id="setupOtpErr" style="text-align:center;"></div>
-      <button class="auth-submit" onclick="submitSetup2FA()">Confirm & Activate 2FA</button>
+      <button class="auth-submit" id="setup2FABtn">Confirm & Activate 2FA</button>
     </div>
 
   </div>
@@ -585,36 +579,36 @@ tr:hover td { background:rgba(255,255,255,0.025); }
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section-label">Overview</div>
-      <div class="nav-item active" onclick="showPage('dashboard',this)">
+      <div class="nav-item active" data-page="dashboard">
         <span class="nav-item-icon">📊</span> Dashboard
       </div>
       <div class="nav-section-label">Orders</div>
-      <div class="nav-item" onclick="showPage('orders',this)">
+      <div class="nav-item" data-page="orders">
         <span class="nav-item-icon">📋</span> All Orders
         <span class="nav-badge" id="pendingBadge" style="display:none;"></span>
       </div>
-      <div class="nav-item" onclick="showPage('production',this)">
+      <div class="nav-item" data-page="production">
         <span class="nav-item-icon">🖨️</span> In Production
       </div>
       <div class="nav-section-label">Customers</div>
-      <div class="nav-item" onclick="showPage('customers',this)">
+      <div class="nav-item" data-page="customers">
         <span class="nav-item-icon">👥</span> Customers
       </div>
       <div class="nav-section-label">Reports</div>
-      <div class="nav-item" onclick="showPage('discounts',this)">
+      <div class="nav-item" data-page="discounts">
         <span class="nav-item-icon">🏷️</span> Discount Codes
       </div>
-      <div class="nav-item" onclick="showPage('reports',this)">
+      <div class="nav-item" data-page="reports">
         <span class="nav-item-icon">📈</span> Sales &amp; Margin
       </div>
-      <div class="nav-item" onclick="showPage('taxreport',this)">
+      <div class="nav-item" data-page="taxreport">
         <span class="nav-item-icon">🏛️</span> Sales Tax
       </div>
       <div class="nav-section-label">System</div>
-      <div class="nav-item" onclick="showPage('settings',this)">
+      <div class="nav-item" data-page="settings">
         <span class="nav-item-icon">⚙️</span> Settings
       </div>
-      <div class="nav-item" onclick="showPage('health',this)">
+      <div class="nav-item" data-page="health">
         <span class="nav-item-icon">🩺</span> System Health
       </div>
     </nav>
@@ -626,21 +620,21 @@ tr:hover td { background:rgba(255,255,255,0.025); }
           <div class="admin-role">🔐 2FA Active</div>
         </div>
       </div>
-      <button class="logout-btn" onclick="logout()">Sign Out</button>
+      <button class="logout-btn" id="logoutBtn">Sign Out</button>
     </div>
   </nav>
 
   <!-- MAIN -->
   <div id="main">
     <div id="topbar">
-      <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleSidebar()">☰</button>
-      <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
+      <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+      <div class="mobile-overlay" id="mobileOverlay"></div>
       <div class="topbar-title" id="topbarTitle">Dashboard</div>
       <div class="topbar-search">
         <span style="font-size:14px;opacity:0.4;">🔍</span>
-        <input type="text" placeholder="Search orders, customers..." id="globalSearch" oninput="handleGlobalSearch(this.value)">
+        <input type="text" placeholder="Search orders, customers..." id="globalSearch" id="globalSearch">
       </div>
-      <button class="refresh-btn" onclick="refreshCurrentPage()" title="Refresh">↻</button>
+      <button class="refresh-btn" id="refreshBtn" title="Refresh">↻</button>
     </div>
 
     <div id="content">
@@ -673,7 +667,7 @@ tr:hover td { background:rgba(255,255,255,0.025); }
           <div class="table-header">
             <div class="table-title">Recent Orders</div>
             <div class="table-actions">
-              <button class="btn-sm btn-sm-ghost" onclick="showPage('orders',document.querySelector('.nav-item:nth-child(4)'))">View All</button>
+              <button class="btn-sm btn-sm-ghost" id="viewAllOrdersBtn">View All</button>
             </div>
           </div>
           <div style="overflow-x:auto;">
@@ -690,7 +684,7 @@ tr:hover td { background:rgba(255,255,255,0.025); }
       <!-- ─── ALL ORDERS ─── -->
       <div class="page" id="page-orders">
         <div class="filter-bar">
-          <select class="filter-select" id="orderStatusFilter" onchange="loadOrders()">
+          <select class="filter-select" id="orderStatusFilter" class="filter-select order-filter">
             <option value="all">All Statuses</option>
             <option value="order_placed">Order Placed</option>
             <option value="approval_sent">Approval Sent</option>
@@ -703,13 +697,13 @@ tr:hover td { background:rgba(255,255,255,0.025); }
           </select>
           <div class="filter-search">
             <span style="opacity:0.4;font-size:13px;">🔍</span>
-            <input type="text" placeholder="Search by order #, name, email..." id="orderSearch" oninput="debounceOrderSearch()">
+            <input type="text" placeholder="Search by order #, name, email..." id="orderSearch" id="orderSearch">
           </div>
-          <select class="filter-select" id="orderTenantFilter" onchange="loadOrders()" style="width:160px;" title="Filter by storefront">
+          <select class="filter-select" id="orderTenantFilter" class="filter-select order-filter" style="width:160px;" title="Filter by storefront">
             <option value="all">All Storefronts</option>
           </select>
-          <input type="date" class="filter-select" id="orderDateFrom" onchange="loadOrders()" style="width:150px;" title="From date">
-          <input type="date" class="filter-select" id="orderDateTo" onchange="loadOrders()" style="width:150px;" title="To date">
+          <input type="date" class="filter-select" id="orderDateFrom" class="filter-select order-filter" style="width:150px;" title="From date">
+          <input type="date" class="filter-select" id="orderDateTo" class="filter-select order-filter" style="width:150px;" title="To date">
           <span class="filter-count" id="orderCount"></span>
         </div>
         <div class="table-card">
@@ -731,7 +725,7 @@ tr:hover td { background:rgba(255,255,255,0.025); }
           <div class="table-header">
             <div class="table-title">In Production</div>
             <div class="table-actions">
-              <button class="btn-sm btn-sm-ghost" onclick="loadProduction()">↻ Refresh</button>
+              <button class="btn-sm btn-sm-ghost" id="refreshProductionBtn">↻ Refresh</button>
             </div>
           </div>
           <div style="overflow-x:auto;">
@@ -750,7 +744,7 @@ tr:hover td { background:rgba(255,255,255,0.025); }
         <div class="filter-bar">
           <div class="filter-search">
             <span style="opacity:0.4;font-size:13px;">🔍</span>
-            <input type="text" placeholder="Search customers..." id="customerSearch" oninput="debounceCustomerSearch()">
+            <input type="text" placeholder="Search customers..." id="customerSearch" id="customerSearch">
           </div>
           <span class="filter-count" id="customerCount"></span>
         </div>
@@ -778,14 +772,14 @@ tr:hover td { background:rgba(255,255,255,0.025); }
             <div class="s-field"><label>Address</label><input type="text" id="s-businessAddress"></div>
             <div class="s-field"><label>Order # Prefix</label><input type="text" id="s-orderPrefix" maxlength="6"></div>
             <div class="s-field"><label>Tax Rate (%)</label><input type="number" id="s-taxRate" min="0" max="20" step="0.1"></div>
-            <button class="auth-submit" style="margin-top:8px;" onclick="saveSettings()">Save Business Settings</button>
+            <button class="auth-submit" id="saveSettingsBtn" style="margin-top:8px;">Save Business Settings</button>
           </div>
           <div class="settings-card">
             <div class="settings-card-title">🔗 Integrations</div>
             <div class="s-toggle">
               <span class="s-toggle-label">Google Drive Upload</span>
               <label class="toggle-switch">
-                <input type="checkbox" id="s-googleDriveEnabled" onchange="saveSetting('googleDriveEnabled',this.checked)">
+                <input type="checkbox" id="s-googleDriveEnabled" id="s-googleDriveEnabled" data-setting="googleDriveEnabled">
                 <div class="toggle-track"></div>
                 <div class="toggle-thumb"></div>
               </label>
@@ -797,17 +791,17 @@ tr:hover td { background:rgba(255,255,255,0.025); }
             <div class="s-toggle">
               <span class="s-toggle-label">Email Notifications</span>
               <label class="toggle-switch">
-                <input type="checkbox" id="s-emailNotifications" onchange="saveSetting('emailNotifications',this.checked)">
+                <input type="checkbox" id="s-emailNotifications" id="s-emailNotifications" data-setting="emailNotifications">
                 <div class="toggle-track"></div>
                 <div class="toggle-thumb"></div>
               </label>
             </div>
-            <button class="btn-sm btn-sm-ghost" style="margin-top:16px;width:100%;" onclick="saveDriveSettings()">Save Drive Settings</button>
+            <button class="btn-sm btn-sm-ghost" style="margin-top:16px;width:100%;" id="saveDriveBtn">Save Drive Settings</button>
             <div class="settings-card-title" style="margin-top:24px;">🔐 Security</div>
             <div style="font-size:13px;color:rgba(245,240,232,0.5);margin-bottom:12px;line-height:1.6;">
               Two-factor authentication is <strong style="color:#2aaa5c;">active</strong>. Required for all admin logins.
             </div>
-            <button class="btn-sm btn-sm-ghost" style="width:100%;" onclick="showToast('Reset 2FA via npm run setup-admin on the server.','warn')">Reset 2FA (requires server access)</button>
+            <button class="btn-sm btn-sm-ghost" style="width:100%;" id="reset2FABtn">Reset 2FA (requires server access)</button>
           </div>
           <div class="settings-card">
             <div class="settings-card-title">💳 Stripe Configuration</div>
@@ -836,7 +830,7 @@ tr:hover td { background:rgba(255,255,255,0.025); }
             <div id="healthChecks">
               <div style="color:rgba(245,240,232,0.4);font-size:14px;">Running checks...</div>
             </div>
-            <button class="btn-sm btn-sm-ghost" style="margin-top:20px;" onclick="loadHealth()">↻ Run Checks Again</button>
+            <button class="btn-sm btn-sm-ghost" style="margin-top:20px;" id="runHealthBtn">↻ Run Checks Again</button>
           </div>
           <div class="table-card" style="margin-top:20px;">
             <div class="table-header"><div class="table-title">Recent Access Log</div></div>
@@ -855,7 +849,7 @@ tr:hover td { background:rgba(255,255,255,0.025); }
         <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:22px;">
           <div>
             <div style="font-family:var(--font-cond);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.4);margin-bottom:5px;">Report Type</div>
-            <select class="filter-select" id="reportType" onchange="toggleReportControls()" style="width:200px;">
+            <select class="filter-select" id="reportType" id="reportType" style="width:200px;">
               <option value="mtd">Month to Date (MTD)</option>
               <option value="monthly">Full Month</option>
               <option value="daily">Single Day</option>
@@ -897,8 +891,8 @@ tr:hover td { background:rgba(255,255,255,0.025); }
               <option value="all">All Storefronts</option>
             </select>
           </div>
-          <button class="btn-sm btn-sm-primary" onclick="runReport()" style="height:36px;padding:0 20px;align-self:flex-end;">Run Report</button>
-          <button class="btn-sm btn-sm-ghost" id="csvBtn" onclick="downloadReportCSV()" style="height:36px;padding:0 16px;align-self:flex-end;display:none;">⬇ Export CSV</button>
+          <button class="btn-sm btn-sm-primary" id="runReportBtn" style="height:36px;padding:0 20px;align-self:flex-end;">Run Report</button>
+          <button class="btn-sm btn-sm-ghost" id="csvBtn" id="csvBtn" style="height:36px;padding:0 16px;align-self:flex-end;display:none;">⬇ Export CSV</button>
         </div>
 
         <!-- KPI Summary Cards -->
@@ -971,8 +965,8 @@ tr:hover td { background:rgba(255,255,255,0.025); }
               <option value="all">All Storefronts</option>
             </select>
           </div>
-          <button class="btn-sm btn-sm-primary" onclick="runTaxReport()" style="height:36px;padding:0 20px;align-self:flex-end;">Run Tax Report</button>
-          <button class="btn-sm btn-sm-ghost" id="taxCsvBtn" onclick="downloadTaxCSV()" style="height:36px;display:none;padding:0 16px;align-self:flex-end;">⬇ Export CSV</button>
+          <button class="btn-sm btn-sm-primary" id="runTaxBtn" style="height:36px;padding:0 20px;align-self:flex-end;">Run Tax Report</button>
+          <button class="btn-sm btn-sm-ghost" id="taxCsvBtn" id="taxCsvBtn" style="height:36px;display:none;padding:0 16px;align-self:flex-end;">⬇ Export CSV</button>
         </div>
 
         <div id="taxKPIs" class="stat-grid" style="margin-bottom:20px;"></div>
@@ -1010,7 +1004,7 @@ tr:hover td { background:rgba(255,255,255,0.025); }
       <div class="page" id="page-discounts">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
           <div style="font-family:var(--font-cond);font-size:14px;color:rgba(245,240,232,0.5);">Create and manage discount codes. Toggle a code inactive to disable it without deleting.</div>
-          <button class="btn-sm btn-sm-primary" onclick="openDiscountModal()">+ New Code</button>
+          <button class="btn-sm btn-sm-primary" id="newDiscountBtn">+ New Code</button>
         </div>
         <div class="table-card">
           <div style="overflow-x:auto;">
@@ -1030,7 +1024,7 @@ tr:hover td { background:rgba(255,255,255,0.025); }
         <div class="modal-box" style="max-width:480px;">
           <div class="modal-header">
             <div class="modal-title" id="discountModalTitle">New Discount Code</div>
-            <button class="modal-close" onclick="closeDiscountModal()">✕</button>
+            <button class="modal-close" id="closeDiscountModalBtn">✕</button>
           </div>
           <div class="modal-body">
             <div class="field-row">
@@ -1086,7 +1080,7 @@ tr:hover td { background:rgba(255,255,255,0.025); }
               <label style="font-family:var(--font-cond);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,240,232,0.4);margin-bottom:5px;display:block;">Description (internal note)</label>
               <input type="text" id="dc-desc" placeholder="e.g. Summer sale promo" style="width:100%;padding:9px 12px;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--cream);font-size:14px;">
             </div>
-            <button class="pay-btn" onclick="saveDiscount()" style="margin-top:8px;">Save Code</button>
+            <button class="pay-btn" id="saveDiscountBtn" style="margin-top:8px;">Save Code</button>
           </div>
         </div>
       </div>
@@ -1096,17 +1090,17 @@ tr:hover td { background:rgba(255,255,255,0.025); }
 </div><!-- /appShell -->
 
 <!-- ORDER DETAIL PANEL -->
-<div class="overlay" id="overlay" onclick="closePanel()"></div>
+<div class="overlay" id="overlay"></div>
 <div class="detail-panel" id="detailPanel">
   <div class="panel-header">
     <div class="panel-title" id="panelOrderNum">Order Details</div>
-    <button class="panel-close" onclick="closePanel()">✕</button>
+    <button class="panel-close" id="panelCloseBtn">✕</button>
   </div>
   <div class="panel-body" id="panelBody"></div>
   <div class="panel-footer">
     <select class="status-select" id="panelStatusSelect"></select>
     <input type="text" class="status-select" id="panelTracking" placeholder="Tracking # (optional)" style="flex:1;">
-    <button class="panel-save-btn" onclick="saveOrderStatus()">Save</button>
+    <button class="panel-save-btn" id="panelSaveBtn">Save</button>
   </div>
 </div>
 
@@ -1423,13 +1417,13 @@ async function loadDashboard() {
     // Recent orders table
     document.getElementById('recentOrdersBody').innerHTML = (data.recentOrders||[]).map(o => `
       <tr>
-        <td class="td-mono"><a href="#" onclick="openOrderDetail('${o.id}');return false;" style="color:var(--gold);">${o.orderNumber}</a></td>
+        <td class="td-mono"><a href="#" data-orderid="${o.id}" style="color:var(--gold);">${o.orderNumber}</a></td>
         <td class="td-name">${esc(o.customerName)}</td>
         <td>${o.itemCount} banner${o.itemCount!==1?'s':''}</td>
         <td>${fmt$(o.total)}</td>
         <td>${statusBadge(o.status)}</td>
         <td style="font-size:12px;color:rgba(245,240,232,0.4);">${fmtDate(o.createdAt)}</td>
-        <td class="td-action"><button class="btn-sm btn-sm-ghost" onclick="openOrderDetail('${o.id}')">View</button></td>
+        <td class="td-action"><button class="btn-sm btn-sm-ghost" data-orderid="${o.id}">View</button></td>
       </tr>`).join('');
 
   } catch (e) {
@@ -1463,7 +1457,7 @@ async function loadOrders() {
         <td>${fmt$(o.total)}</td>
         <td>${statusBadge(o.status)}</td>
         <td style="font-size:12px;color:rgba(245,240,232,0.4);">${fmtDate(o.createdAt)}</td>
-        <td class="td-action"><button class="btn-sm btn-sm-ghost" onclick="openOrderDetail('${o.id}')">View →</button></td>
+        <td class="td-action"><button class="btn-sm btn-sm-ghost" data-orderid="${o.id}">View →</button></td>
       </tr>`).join('') || '<tr><td colspan="8" style="text-align:center;color:rgba(245,240,232,0.3);padding:32px;">No orders found.</td></tr>';
 
     // Pagination
@@ -1497,9 +1491,9 @@ async function loadProduction() {
         <td>${statusBadge(o.status)}</td>
         <td>${o.driveFolderLink ? `<a href="${o.driveFolderLink}" target="_blank" style="color:var(--gold);font-size:12px;">Open Drive ↗</a>` : '<span style="color:rgba(245,240,232,0.3);font-size:12px;">—</span>'}</td>
         <td class="td-action">
-          <button class="btn-sm btn-sm-ghost" onclick="sendProof('${o.id}')" style="margin-right:4px;">📧 Send Proof</button>
-          <button class="btn-sm btn-sm-primary" onclick="quickStatus('${o.id}','printed')" style="margin-right:4px;">→ Printed</button>
-          <button class="btn-sm btn-sm-success" onclick="quickStatus('${o.id}','shipped')">→ Shipped</button>
+          <button class="btn-sm btn-sm-ghost" data-action="proof" data-id="${o.id}" style="margin-right:4px;">📧 Send Proof</button>
+          <button class="btn-sm btn-sm-primary" data-action="printed" data-id="${o.id}" style="margin-right:4px;">→ Printed</button>
+          <button class="btn-sm btn-sm-success" data-action="shipped" data-id="${o.id}">→ Shipped</button>
         </td>
       </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:rgba(245,240,232,0.3);padding:32px;">No orders in production.</td></tr>';
   } catch(e) { console.error('[Production]', e); }
@@ -1557,7 +1551,7 @@ async function openOrderDetail(id) {
       <div class="panel-section">
         <div class="panel-section-title">Notes</div>
         <textarea id="panelNotes" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--cream);padding:10px;font-size:13px;resize:vertical;min-height:80px;">${esc(o.notes||'')}</textarea>
-        <button class="btn-sm btn-sm-ghost" style="margin-top:8px;" onclick="saveNotes()">Save Notes</button>
+        <button class="btn-sm btn-sm-ghost" style="margin-top:8px;" id="saveNotesBtn">Save Notes</button>
       </div>
       <div class="panel-section" style="margin-bottom:0;">
         <div class="panel-section-title">Timeline</div>
@@ -1658,7 +1652,7 @@ async function loadCustomers() {
         <td>${c.orderCount}</td>
         <td style="color:var(--gold);font-family:var(--font-cond);font-size:16px;">${fmt$(c.totalSpend)}</td>
         <td style="font-size:12px;color:rgba(245,240,232,0.4);">${fmtDate(c.createdAt)}</td>
-        <td class="td-action"><button class="btn-sm btn-sm-ghost" onclick="viewCustomer('${c.id}')">View</button></td>
+        <td class="td-action"><button class="btn-sm btn-sm-ghost" data-customerid="${c.id}">View</button></td>
       </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:rgba(245,240,232,0.3);padding:32px;">No customers yet.</td></tr>';
     renderPagination('customersPagination', data.page, data.pages, (p)=>{ customersPage=p; loadCustomers(); });
   } catch(e) { console.error('[Customers]', e); }
@@ -2238,7 +2232,7 @@ loadOrders = async function() {
         <td>${fmt$(o.total)}</td>
         <td>${statusBadge(o.status)}</td>
         <td style="font-size:12px;color:rgba(245,240,232,0.4);">${fmtDate(o.createdAt)}</td>
-        <td class="td-action"><button class="btn-sm btn-sm-ghost" onclick="openOrderDetail('${o.id}')">View →</button></td>
+        <td class="td-action"><button class="btn-sm btn-sm-ghost" data-orderid="${o.id}">View →</button></td>
       </tr>`).join('') || '<tr><td colspan="9" style="text-align:center;color:rgba(245,240,232,0.3);padding:32px;">No orders found.</td></tr>';
 
     renderPagination('ordersPagination', data.page, data.pages, (p) => { ordersPage=p; loadOrders(); });
@@ -2413,8 +2407,8 @@ function renderDiscounts(codes) {
       <td style="font-family:var(--font-cond);font-size:14px;">${d.usedCount}${d.maxUses ? '/'+d.maxUses : ''}</td>
       <td><span class="badge ${isActive ? 'badge-order_approved' : 'badge-cancelled'}">${isActive ? 'active' : d.status}</span></td>
       <td class="td-action" style="display:flex;gap:6px;flex-wrap:nowrap;">
-        <button class="btn-sm btn-sm-ghost" onclick="editDiscount(${JSON.stringify(JSON.stringify(d)).slice(1,-1)})">Edit</button>
-        <button class="btn-sm btn-sm-ghost" onclick="toggleDiscountActive('${d.id}',${!d.active})" style="color:${d.active?'#d4a843':'#2aaa5c'};">${d.active ? 'Disable' : 'Enable'}</button>
+        <button class="btn-sm btn-sm-ghost" data-discountid="${d.id}" data-discount='${JSON.stringify(d).replace(/'/g, "&apos;")}'  data-action="edit">Edit</button>
+        <button class="btn-sm btn-sm-ghost" data-discountid="${d.id}" data-active="${!d.active}" data-action="toggle" style="color:${d.active?'#d4a843':'#2aaa5c'};">${d.active ? 'Disable' : 'Enable'}</button>
       </td>
     </tr>`;
   }).join('');
@@ -2490,6 +2484,104 @@ async function sendProof(orderId) {
   closePanel();
   refreshCurrentPage();
 }
+
+// ═══════════════════════════════════════════════════
+// EVENT LISTENER WIRING — zero inline handlers
+// ═══════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+
+  // ── Auth ────────────────────────────────────────
+  document.getElementById('loginBtn')?.addEventListener('click', submitLogin);
+  document.getElementById('twoFABtn')?.addEventListener('click', submitTwoFA);
+  document.getElementById('backToLoginBtn')?.addEventListener('click', backToLogin);
+  document.getElementById('setup2FABtn')?.addEventListener('click', submitSetup2FA);
+  document.getElementById('loginPasswordInput')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') submitLogin();
+  });
+
+  // ── Navigation ───────────────────────────────────
+  document.querySelectorAll('.nav-item[data-page]').forEach(el => {
+    el.addEventListener('click', function() { showPage(this.dataset.page, this); });
+  });
+  document.getElementById('logoutBtn')?.addEventListener('click', logout);
+  document.getElementById('mobileMenuBtn')?.addEventListener('click', toggleSidebar);
+  document.getElementById('mobileOverlay')?.addEventListener('click', toggleSidebar);
+  document.getElementById('refreshBtn')?.addEventListener('click', refreshCurrentPage);
+
+  // ── Dashboard ────────────────────────────────────
+  document.getElementById('viewAllOrdersBtn')?.addEventListener('click', () => {
+    showPage('orders', document.querySelector('.nav-item[data-page="orders"]'));
+  });
+  document.getElementById('refreshProductionBtn')?.addEventListener('click', loadProduction);
+
+  // ── Search & filters ─────────────────────────────
+  document.getElementById('globalSearch')?.addEventListener('input', e => handleGlobalSearch(e.target.value));
+  document.getElementById('orderSearch')?.addEventListener('input', debounceOrderSearch);
+  document.getElementById('customerSearch')?.addEventListener('input', debounceCustomerSearch);
+  document.querySelectorAll('.order-filter').forEach(el => {
+    el.addEventListener('change', loadOrders);
+  });
+
+  // ── Reports ──────────────────────────────────────
+  document.getElementById('reportType')?.addEventListener('change', toggleReportControls);
+  document.getElementById('runReportBtn')?.addEventListener('click', runReport);
+  document.getElementById('csvBtn')?.addEventListener('click', downloadReportCSV);
+  document.getElementById('runTaxBtn')?.addEventListener('click', runTaxReport);
+  document.getElementById('taxCsvBtn')?.addEventListener('click', downloadTaxCSV);
+
+  // ── Settings ─────────────────────────────────────
+  document.getElementById('saveSettingsBtn')?.addEventListener('click', saveSettings);
+  document.getElementById('saveDriveBtn')?.addEventListener('click', saveDriveSettings);
+  document.getElementById('reset2FABtn')?.addEventListener('click', () => showToast('Reset 2FA via Railway terminal: npm run setup-admin', 'warn'));
+  document.getElementById('runHealthBtn')?.addEventListener('click', loadHealth);
+  document.querySelectorAll('[data-setting]').forEach(el => {
+    el.addEventListener('change', function() { saveSetting(this.dataset.setting, this.checked); });
+  });
+
+  // ── Discounts ─────────────────────────────────────
+  document.getElementById('newDiscountBtn')?.addEventListener('click', () => openDiscountModal());
+  document.getElementById('closeDiscountModalBtn')?.addEventListener('click', closeDiscountModal);
+  document.getElementById('saveDiscountBtn')?.addEventListener('click', saveDiscount);
+
+  // ── Order panel ──────────────────────────────────
+  document.getElementById('overlay')?.addEventListener('click', closePanel);
+  document.getElementById('panelCloseBtn')?.addEventListener('click', closePanel);
+  document.getElementById('panelSaveBtn')?.addEventListener('click', saveOrderStatus);
+  document.getElementById('saveNotesBtn')?.addEventListener('click', saveNotes);
+
+  // ── Event delegation for dynamic table rows ───────
+  // Orders table
+  document.getElementById('content')?.addEventListener('click', function(e) {
+    // Order detail (order number link or View button)
+    const orderEl = e.target.closest('[data-orderid]');
+    if (orderEl) { e.preventDefault(); openOrderDetail(orderEl.dataset.orderid); return; }
+
+    // Production quick actions
+    const actionEl = e.target.closest('[data-action][data-id]');
+    if (actionEl) {
+      const { action, id } = actionEl.dataset;
+      if (action === 'proof')   sendProof(id);
+      if (action === 'printed') quickStatus(id, 'printed');
+      if (action === 'shipped') quickStatus(id, 'shipped');
+      return;
+    }
+
+    // Customer view
+    const custEl = e.target.closest('[data-customerid]');
+    if (custEl) { viewCustomer(custEl.dataset.customerid); return; }
+
+    // Discount edit/toggle
+    const discEl = e.target.closest('[data-discountid]');
+    if (discEl) {
+      const { action, discountid, discount, active } = discEl.dataset;
+      if (action === 'edit')   { try { editDiscount(discount.replace(/&apos;/g, "'")); } catch(e) {} }
+      if (action === 'toggle') toggleDiscountActive(discountid, active === 'true');
+      return;
+    }
+  });
+
+});
+
 
 </script>
 </body>
