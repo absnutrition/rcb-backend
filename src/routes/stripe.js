@@ -83,7 +83,7 @@ router.post('/create-checkout-session', async (req, res) => {
       customer_email:      customer.email,
       shipping_address_collection: { allowed_countries: ['US'] },
       metadata:            { orderNumber, tenantId: tenantId || 'rcb' },
-      success_url:         `${frontendUrl}/?order_success=1&order=${orderNumber}`,
+      success_url:         `${frontendUrl}/track?order=${orderNumber}&order_success=1`,
       cancel_url:          `${frontendUrl}/?order_cancelled=1`,
     });
 
